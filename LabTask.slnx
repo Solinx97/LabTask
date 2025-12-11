@@ -8,4 +8,11 @@
     <Project Path="src/API/LabTask.API/LabTask.API.csproj" />
     <Project Path="src/API/LabTask.UserAPI/LabTask.UserAPI.csproj" Id="1168024b-4134-4b61-98e5-672f8b96f126" />
   </Folder>
+  <Folder Name="/src/Web/">
+    <Project Path="src/WebApp/webapp.client/webapp.client.esproj">
+      <Build />
+      <Deploy />
+    </Project>
+    <Project Path="src/WebApp/WebApp.Server/WebApp.Server.csproj" Id="cf62fabd-a233-4706-a2eb-5b4af666a5a4" />
+  </Folder>
 </Solution>

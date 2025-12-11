@@ -1,4 +1,5 @@
 ﻿using LabTask.Application.Commands.CreateDocument;
+using LabTask.Application.Queries.GetAllDocuments;
 using LabTask.Application.Queries.GetDocument;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -19,6 +20,14 @@ public class DocumentController(IMediator mediator) : ControllerBase
         await _mediator.Send(command);
 
         return Ok();
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var documents = await _mediator.Send(new GetAllDocumentsQuery());
+
+        return Ok(documents);
     }
 
     [HttpGet("{id}")]

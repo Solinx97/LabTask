@@ -14,11 +14,11 @@ namespace LabTask.UserAPI.Controllers;
 
 [Route("api/v1/[controller]")]
 [ApiController]
-public class UserController(UserManager<ApplicationUser> userManager, IConfiguration configuration, IOptions<Authentication> options) : ControllerBase
+public class UserController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IOptions<Authentication> options) : ControllerBase
 {
     private readonly UserManager<ApplicationUser> _userManager = userManager;
+    private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
     private readonly Authentication authentication = options.Value;
-    private readonly IConfiguration _configuration = configuration;
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterDto dto)
@@ -47,16 +47,25 @@ public class UserController(UserManager<ApplicationUser> userManager, IConfigura
 
         var token = GenerateJwtToken(user);
 
-        return Ok(new { token });
+        return Ok(new { User = user, Token = token });
+    }
+
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        await _signInManager.SignOutAsync();
+
+        return Ok();
     }
 
     [Authorize]
-    [HttpGet("profile")]
+    [HttpGet]
     public IActionResult GetProfile()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var user = new { UserId = userId };
 
-        return Ok(new { UserId = userId });
+        return Ok(user);
     }
 
     private string GenerateJwtToken(ApplicationUser user)
