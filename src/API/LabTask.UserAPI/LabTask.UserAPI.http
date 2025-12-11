@@ -1,0 +1,6 @@
+@LabTask.UserAPI_HostAddress = http://localhost:5293
+
+GET {{LabTask.UserAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
