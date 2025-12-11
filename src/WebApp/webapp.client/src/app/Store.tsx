@@ -1,5 +1,5 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import { DocumentApi } from '../features/shared/api/Document.api';
+import { DocumentApi } from '../features/document/api/Document.api';
 import { UserApi } from '../features/user/api/User.api';
 import userReducer from '../features/user/store/UserSlice';
 

@@ -13,7 +13,7 @@ public class GetDocumentHandler(AppDbContext db) : IRequestHandler<GetDocumentQu
     {
         var document = await _db.Document
             .Where(o => o.Id == request.Id)
-            .Select(o => new DocumentDto(o.Id, o.Name, o.Description, o.ExpireAt))
+            .Select(o => new DocumentDto(o.Id, o.Name, o.Description, o.ExpireAt, o.UserId))
             .FirstOrDefaultAsync();
 
         return document;

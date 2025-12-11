@@ -36,9 +36,9 @@ internal class HttpClientHelper : IHttpClientHelper
         return result;
     }
 
-    public async Task<HttpResponseMessage> PutAsync(string requestUri, JsonContent content)
+    public async Task<HttpResponseMessage> PatchAsync(string requestUri, JsonContent content)
     {
-        var result = await _client.PutAsync($"{APIUrl}{BaseAddressApi}{requestUri}", content);
+        var result = await _client.PatchAsync($"{APIUrl}{BaseAddressApi}{requestUri}", content);
 
         return result;
     }

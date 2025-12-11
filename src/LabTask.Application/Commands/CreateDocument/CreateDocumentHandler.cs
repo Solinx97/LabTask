@@ -11,7 +11,7 @@ internal class CreateDocumentHandler(IGenericRepository<Document> repository, IU
 
     public async Task<Guid> Handle(CreateDocumentCommand request, CancellationToken cancellationToken)
     {
-        var document = Document.Create(request.Name, request.Description, request.ExpireAt);
+        var document = Document.Create(request.Name, request.Description, request.ExpireAt, request.UserId);
         await _repository.AddAsync(document);
 
         await _unitOfWork.SaveChangesAsync();

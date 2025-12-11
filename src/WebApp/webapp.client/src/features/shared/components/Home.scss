@@ -18,37 +18,12 @@ $mobile-max-width: 425px;
         flex-direction: column;
         align-items: center;
         gap: $gap-medium;
-
-        .go-to-communication, .go-to-combat-logs {
-            padding: $padding;
-            border-radius: $border-radius;
-            box-shadow: $box-shadow;
-            font-size: $font-size;
-            cursor: pointer;
-        }
     }
 
     .title {
         display: flex;
         align-items: center;
         gap: $gap-medium;
-
-        .authorize-alert {
-            width: 35px;
-            overflow: hidden;
-            white-space: nowrap;
-            font-size: 0.9em;
-
-            &:hover {
-                animation-name: need-be-authorize;
-                animation-duration: 0.5s;
-                animation-fill-mode: forwards;
-            }
-
-            svg {
-                color: orange;
-            }
-        }
 
         @keyframes need-be-authorize {
             from {
@@ -67,8 +42,15 @@ $mobile-max-width: 425px;
         padding: 20px;
 
         &__item {
+            display: flex;
+            flex-direction: column;
             margin: 20px 10px;
         }
+    }
+
+    .manage {
+        display: flex;
+        gap: 30px;
     }
 }
 
@@ -79,33 +61,12 @@ $mobile-max-width: 425px;
 
         &__item {
             gap: $gap-medium;
-
-            .go-to-communication, .go-to-combat-logs {
-                font-size: $font-size;
-                padding: 8px 16px;
-            }
-        }
-
-        .should-be-authorize {
-            left: 10%;
-            width: 80%;
         }
 
         .title {
             display: flex;
             flex-direction: column;
             gap: 5px;
-
-            .authorize-alert {
-                width: auto;
-                overflow: auto;
-                white-space: normal;
-                height: 30px;
-
-                &:hover {
-                    animation: none;
-                }
-            }
         }
     }
 }

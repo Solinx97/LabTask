@@ -12,7 +12,7 @@ public interface IHttpClientHelper
 
     Task<HttpResponseMessage> GetAsync(string requestAddress);
 
-    Task<HttpResponseMessage> PutAsync(string requestAddress, JsonContent content);
+    Task<HttpResponseMessage> PatchAsync(string requestAddress, JsonContent content);
 
     Task<HttpResponseMessage> DeletAsync(string requestAddress);
 }

@@ -1,48 +1,62 @@
-import { useGetAllDocumentsQuery, useLazyGetDocumentByIdQuery } from '@/features/shared/api/Document.api';
-import { useRef, useState } from 'react';
+import type { RootState } from '@/app/Store';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { DocumentModel } from '../types/DocumentModel';
-import Loading from './Loading';
+import Create from '@/features/document/components/Create';
+import Documents from '@/features/document/components/Documents';
+import Search from '@/features/document/components/Search';
+import { useSelector } from 'react-redux';
 
 import './Home.scss';
 
 const Home: React.FC = () => {
     const { t } = useTranslation('home');
 
-    const { data: documents, isLoading } = useGetAllDocumentsQuery();
-    const [getDocument] = useLazyGetDocumentByIdQuery();
+    const user = useSelector((state: RootState) => state.user.value);
 
-    const documentIdRef = useRef<HTMLInputElement | null>(null);
+    const [section, setSection] = useState(-1);
 
-    const [document, setDocument] = useState<DocumentModel | null>(null);
-    
-    const getDocumentAsync = async () => {
-        try {
-            const document = await getDocument(documentIdRef.current ? documentIdRef.current.value : "").unwrap();
-            setDocument(document);
-        } catch (e) {
-            console.log(e);
+    const getMenu = () => {
+        const menu = ["Create document", "My documents", "Searching", "History", "Manage"];
+
+        if (user) {
+            return (
+                menu.map((item, index) => (
+                    <button key={index} className="btn-border-shadow" onClick={() => setSection(index)}>{item}</button>
+                ))
+            );
         }
-    }
-
-    if (isLoading) {
-        return (<Loading />);
+        else {
+            return (
+                menu.map((item, index) => (
+                    <button key={index} className="btn-border-shadow" disabled>{item}</button>
+                ))
+            );
+        }
     }
 
     return (
         <div className="home">
             <div className="home__item">
-                <div className="title">{t("Documents")}</div>
-                <input className="form-control" type="text" placeholder="Id" ref={documentIdRef} />
-                <input type="button" className="btn-border-shadow" value="Get" onClick={getDocumentAsync} />
-                <div>{document?.name}</div>
-                <ul className="documents">{documents?.map((document) => (
-                    <li key={document.id} className="documents__item">
-                        <div>{t("Name")}: {document.name}</div>
-                        <div>{t("Description")}: {document.description}</div>
-                    </li>
-                ))}
-                </ul>
+                <div className="manage">
+                    {getMenu()}
+                </div>
+                {section === 0 &&
+                    <Create
+                        t={t}
+                        user={user}
+                    />
+                }
+                {section === 1 &&
+                    <Documents
+                        t={t}
+                        user={user}
+                    />
+                }
+                {section === 2 &&
+                    <Search
+                        t={t}
+                    />
+                }
             </div>
         </div>
     );

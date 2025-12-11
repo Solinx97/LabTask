@@ -23,4 +23,13 @@ internal class GenericRepository(AppDbContext dbContext) : IGenericRepository<Do
 
         return entity;
     }
+
+    public async Task DeletedAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var entity = await _dbContext.Document
+            .FirstOrDefaultAsync(d => d.Id == id, cancellationToken)
+                ?? throw new EntityNotFoundException(typeof(Document), id);
+
+        _dbContext.Document.Remove(entity);
+    }
 }

@@ -12,7 +12,7 @@ public class GetAllDocumentsHandler(AppDbContext db) : IRequestHandler<GetAllDoc
     public async Task<IEnumerable<DocumentDto>> Handle(GetAllDocumentsQuery request, CancellationToken cancellationToken)
     {
         var document = await _db.Document
-            .Select(o => new DocumentDto(o.Id, o.Name, o.Description, o.ExpireAt))
+            .Select(o => new DocumentDto(o.Id, o.Name, o.Description, o.ExpireAt, o.UserId))
             .ToListAsync();
 
         return document;

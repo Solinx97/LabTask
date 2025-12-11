@@ -6,4 +6,6 @@ public interface IGenericRepository<TModel>
     Task AddAsync(TModel item);
 
     Task<TModel?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+
+    Task DeletedAsync(Guid id, CancellationToken cancellationToken = default);
 }

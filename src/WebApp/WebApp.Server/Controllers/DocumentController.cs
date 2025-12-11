@@ -99,4 +99,83 @@ public class DocumentController : ControllerBase
             return StatusCode((int)(ex.StatusCode ?? HttpStatusCode.InternalServerError), ex.Message);
         }
     }
+
+    [HttpGet("getByUserId/{id}")]
+    public async Task<IActionResult> GetByUserId(Guid id)
+    {
+        try
+        {
+            var responseMessage = await _httpClient.GetAsync($"Document/getByUserId/{id}");
+            responseMessage.EnsureSuccessStatusCode();
+
+            var documents = await responseMessage.Content.ReadFromJsonAsync<IEnumerable<DocumentModel>>();
+
+            return Ok(documents);
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
+        {
+            _logger.LogError(ex, "Some issues during get documents by user ID. Please, check your data and try one more time.");
+
+            return BadRequest();
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "Some issues during get documents by user ID. Please, try one more time late.");
+
+            return StatusCode((int)(ex.StatusCode ?? HttpStatusCode.InternalServerError), ex.Message);
+        }
+    }
+
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> PartialUpdate(Guid id, [FromBody] DocumentModel item)
+    {
+        try
+        {
+            if (id != item.Id)
+            {
+                return BadRequest("Route ID and body ID do not match.");
+            }
+
+            var responseMessage = await _httpClient.PatchAsync($"Document/{id}", JsonContent.Create(item));
+            responseMessage.EnsureSuccessStatusCode();
+
+            return NoContent();
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
+        {
+            _logger.LogError(ex, "Some issues during updating document. Please, check your data and try one more time.");
+
+            return BadRequest();
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "Some issues during updating document. Please, try one more time late.");
+
+            return StatusCode((int)(ex.StatusCode ?? HttpStatusCode.InternalServerError), ex.Message);
+        }
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        try
+        {
+            var responseMessage = await _httpClient.DeletAsync($"Document/{id}");
+            responseMessage.EnsureSuccessStatusCode();
+
+            return NoContent();
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
+        {
+            _logger.LogError(ex, "Some issues during deleting document. Please, check your data and try one more time.");
+
+            return BadRequest();
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "Some issues during deleting document. Please, try one more time late.");
+
+            return StatusCode((int)(ex.StatusCode ?? HttpStatusCode.InternalServerError), ex.Message);
+        }
+    }
 }
