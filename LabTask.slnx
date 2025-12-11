@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/LabTask.API/LabTask.API.csproj" />
+    <Project Path="src/LabTask.Application/LabTask.Application.csproj" Id="a01339fe-a3ec-4db4-b698-d6d4f9bb7278" />
+    <Project Path="src/LabTask.Domain/LabTask.Domain.csproj" Id="4c67ad37-37a9-47b5-8e7b-872c6c2192e0" />
+    <Project Path="src/LabTask.Infrastructure/LabTask.Infrastructure.csproj" Id="f75cae3a-a4d9-4960-9c99-541ccc794554" />
+  </Folder>
+</Solution>
