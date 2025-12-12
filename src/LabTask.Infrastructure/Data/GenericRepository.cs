@@ -1,5 +1,4 @@
-﻿using LabTask.Domain.Aggregates;
-using LabTask.Domain.Data;
+﻿using LabTask.Domain.Data;
 using LabTask.Domain.Interfaces;
 using LabTask.Infrastructure.Exceptions;
 using LabTask.Infrastructure.Persistence;
@@ -17,7 +16,7 @@ internal class GenericRepository<TModel>(AppDbContext dbContext) : IGenericRepos
         await _dbContext.Set<TModel>().AddAsync(item);
     }
 
-    public async Task<TModel?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<TModel> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var entity = await _dbContext.Set<TModel>()
             .FirstOrDefaultAsync(d => d.Id == id, cancellationToken)

@@ -74,12 +74,12 @@ public class DocumentController : ControllerBase
         }
     }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(Guid id)
+    [HttpGet("getByName/{name}")]
+    public async Task<IActionResult> GetByName(string name)
     {
         try
         {
-            var responseMessage = await _httpClient.GetAsync($"Document/{id}");
+            var responseMessage = await _httpClient.GetAsync($"Document/getByName/{name}");
             responseMessage.EnsureSuccessStatusCode();
 
             var document = await responseMessage.Content.ReadFromJsonAsync<DocumentModel>();

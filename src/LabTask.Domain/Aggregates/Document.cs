@@ -1,4 +1,5 @@
 ﻿using LabTask.Domain.Entities;
+using LabTask.Domain.Exceptions;
 using LabTask.Domain.Interfaces;
 
 namespace LabTask.Domain.Aggregates;
@@ -41,6 +42,33 @@ public class Document : IEntityId
         ArgumentNullException.ThrowIfNull(userId, nameof(userId));
 
         return new Document(name, description, expireAt, userId);
+    }
+
+    public void AddComment(string content, Guid userId)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(content, nameof(content));
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(content.Length, Comment.CONTENT_MAX_LENGTH, nameof(content));
+
+        var comment = Comment.Create(content, Id, userId);
+        _comments.Add(comment);
+    }
+
+    public void RemoveComment(Guid commentId)
+    {
+        _comments.RemoveAll(c => c.Id == commentId);
+    }
+
+    public void EditComment(string content, Guid commentId)
+    {
+        var comment = _comments.Where(c => c.Id == commentId).SingleOrDefault();
+        if (comment != null)
+        {
+            comment.Edit(content);
+        }
+        else
+        {
+            throw new DomainException("Comment not found");
+        }
     }
 
     public void Edit(string name, string description)

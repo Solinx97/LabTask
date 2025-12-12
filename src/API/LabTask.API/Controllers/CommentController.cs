@@ -1,9 +1,10 @@
 ﻿using LabTask.Application.Commands.CreateComment;
+using LabTask.Application.Commands.DeleteComment;
 using LabTask.Application.Commands.DeleteDocument;
-using LabTask.Application.Commands.UpdateDocument;
+using LabTask.Application.Commands.UpdateComment;
 using LabTask.Application.DTOs;
-using LabTask.Application.Queries.GetAllDocuments;
-using LabTask.Application.Queries.GetDocument;
+using LabTask.Application.Queries.GetAllComments;
+using LabTask.Application.Queries.GetCommentsByUserId;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -25,44 +26,36 @@ public class CommentController(IMediator mediator) : ControllerBase
         return Ok();
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
+    [HttpGet("getByDocumentId/{id}")]
+    public async Task<IActionResult> GetByDocumentId(Guid id)
     {
-        var documents = await _mediator.Send(new GetAllDocumentsQuery());
+        var comments = await _mediator.Send(new GetAllCommentsQuery(id));
 
-        return Ok(documents);
-    }
-
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(Guid id)
-    {
-        var document = await _mediator.Send(new GetDocumentQuery(id));
-
-        return Ok(document);
+        return Ok(comments);
     }
 
     [HttpGet("getByUserId/{id}")]
     public async Task<IActionResult> GetByUserId(Guid id)
     {
-        var documents = await _mediator.Send(new GetDocumentsByUserIdQuery(id));
+        var comments = await _mediator.Send(new GetCommentsByUserIdQuery(id));
 
-        return Ok(documents);
+        return Ok(comments);
     }
 
     [HttpPatch("{id}")]
-    public async Task<IActionResult> PartialUpdate(Guid id, DocumentDto dto)
+    public async Task<IActionResult> PartialUpdate(Guid id, CommentDto dto)
     {
-        var command = new UpdateDocumentCommand(id, dto.Name, dto.Description);
+        var command = new UpdateCommentCommand(id, dto.Content, dto.DocumentId);
 
         await _mediator.Send(command);
 
         return NoContent();
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(Guid id)
+    [HttpDelete("documents/{documentId}/comments/{commentId}")]
+    public async Task<IActionResult> Delete(Guid documentId, Guid commentId)
     {
-        await _mediator.Send(new DeleteDocumentCommand(id));
+        await _mediator.Send(new DeleteCommentCommand(commentId, documentId));
 
         return NoContent();
     }

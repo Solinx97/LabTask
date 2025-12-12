@@ -36,8 +36,21 @@ $mobile-max-width: 425px;
         }
     }
 
-    .documents {
+    .create-document {
         display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        &__action {
+            display: flex;
+            flex-direction: column;
+            align-items: left;
+        }
+    }
+
+    .documents, .comments {
+        display: flex;
+        justify-content: center;
 
         &__item {
             display: flex;
@@ -46,7 +59,7 @@ $mobile-max-width: 425px;
             box-shadow: 2px 2px 2px 2px aqua;
             border-radius: 10px;
             padding: 20px;
-            margin: 20px 10px;
+            margin: 10px;
             gap: 15px;
             
             .actions {
@@ -65,24 +78,31 @@ $mobile-max-width: 425px;
             }
         }
 
-        .add-comment {
+        .container {
             display: flex;
             flex-direction: column;
             align-items: center;
+        }
+
+        .add-comment, .add-comment__action {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .add-comment {
+            gap: 5px;
         }
     }
 
-    .create-document {
+    .comments {
+        flex-direction: column;
+    }
+
+    .search-document {
         display: flex;
         flex-direction: column;
-        align-items: center;
-        gap: 5px;
-
-        &__action {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+        gap: 10px;
     }
 
     .manage {

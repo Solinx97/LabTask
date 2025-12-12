@@ -16,19 +16,19 @@ const Home: React.FC = () => {
     const [section, setSection] = useState(-1);
 
     const getMenu = () => {
-        const menu = [t("CreateDocument"), t("MyDocuments"), t("Search"), t("History"), t("Manage")];
+        const menu = [t("CreateDocument"), t("MyDocuments"), t("SearchDocument"), t("History"), t("Manage")];
 
         if (user) {
             return (
                 menu.map((item, index) => (
-                    <button key={index} className="btn-border-shadow" onClick={() => setSection(index)}>{item}</button>
+                    <button key={index} className={`btn-border-shadow ${section === index ? 'green' : ''}`} onClick={() => setSection(index)}>{item}</button>
                 ))
             );
         }
         else {
             return (
                 menu.map((item, index) => (
-                    <button key={index} className="btn-border-shadow" disabled>{item}</button>
+                    <button key={index} className={`btn-border-shadow ${section === index ? 'green' : ''}`} disabled>{item}</button>
                 ))
             );
         }
@@ -55,6 +55,7 @@ const Home: React.FC = () => {
                 {section === 2 &&
                     <Search
                         t={t}
+                        userId={user?.id ?? ""}
                     />
                 }
             </div>

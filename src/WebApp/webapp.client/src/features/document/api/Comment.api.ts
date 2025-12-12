@@ -1,5 +1,5 @@
 import type { CommentModel } from '../types/CommentModel';
-import { DocumentApi } from './Dcoument.api';
+import { DocumentApi } from './Document.api';
 
 export const CommentApi = DocumentApi.injectEndpoints({
     endpoints: builder => ({
@@ -23,12 +23,14 @@ export const CommentApi = DocumentApi.injectEndpoints({
                 { type: "Comment", id },
             ]
         }),
-        deleteComment: builder.mutation<void, string>({
-            query: id => ({
-                url: `/Comment/${id}`,
+        deleteComment: builder.mutation<void, { documentId: string, commentId: string }>({
+            query: ({ documentId, commentId }) => ({
+                url: `/Comment/documents/${documentId}/comments/${commentId}`,
                 method: 'DELETE'
             }),
-            invalidatesTags: (_result, _error, id) => [{ type: 'Comment', id }],
+            invalidatesTags: (result, error, { commentId }) => [
+                { type: "Comment", commentId },
+            ]
         }),
         getAllComments: builder.query<CommentModel[], void>({
             query: () => "/Comment",
@@ -40,16 +42,22 @@ export const CommentApi = DocumentApi.injectEndpoints({
                     ]
                     : [{ type: 'Comment', id: 'LIST' }],
         }),
-        getCommentById: builder.query<CommentModel, string>({
-            query: id => `/Comment/${id}`,
-            providesTags: result => result ? [{ type: 'Comment', id: result.id }] : [],
+        getCommentsByDocumentId: builder.query<CommentModel[], string>({
+            query: documentId => `/Comment/getByDocumentId/${documentId}`,
+            providesTags: result =>
+                result
+                    ? [
+                        ...result.map(comment => ({ type: 'Comment' as const, id: comment.id })),
+                        { type: 'Comment', id: 'LIST' },
+                    ]
+                    : [{ type: 'Comment', id: 'LIST' }],
         }),
         getCommentsByUserId: builder.query<CommentModel[], string>({
             query: userId => `/Comment/getByUserId/${userId}`,
             providesTags: result =>
                 result
                     ? [
-                        ...result.map(docuemnt => ({ type: 'Comment' as const, id: docuemnt.id })),
+                        ...result.map(comment => ({ type: 'Comment' as const, id: comment.id })),
                         { type: 'Comment', id: 'LIST' },
                     ]
                     : [{ type: 'Comment', id: 'LIST' }],
@@ -62,6 +70,6 @@ export const {
     useUpdateCommentMutation,
     useDeleteCommentMutation,
     useGetAllCommentsQuery,
-    useLazyGetCommentByIdQuery,
+    useGetCommentsByDocumentIdQuery,
     useGetCommentsByUserIdQuery,
 } = CommentApi;

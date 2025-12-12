@@ -4,6 +4,7 @@
   "Name": "Name",
   "Description": "Description",
   "NoAnyDocuments": "No any documents",
+  "NoAnyComments": "No any comments",
   "Save": "Save",
   "Cancel": "Cancel",
   "Delete": "Delete",
@@ -11,7 +12,7 @@
   "AddComment": "Add comment",
   "CreateDocument": "Create document",
   "MyDocuments": "My documents",
-  "Search": "Search",
+  "SearchDocument": "Search document",
   "History": "History",
   "Manage": "Manage"
 }

@@ -100,6 +100,32 @@ public class CommentController : ControllerBase
         }
     }
 
+    [HttpGet("getByDocumentId/{id}")]
+    public async Task<IActionResult> GetByDocumentId(Guid id)
+    {
+        try
+        {
+            var responseMessage = await _httpClient.GetAsync($"Comment/getByDocumentId/{id}");
+            responseMessage.EnsureSuccessStatusCode();
+
+            var comments = await responseMessage.Content.ReadFromJsonAsync<IEnumerable<CommentModel>>();
+
+            return Ok(comments);
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
+        {
+            _logger.LogError(ex, "Some issues during get comments by user ID. Please, check your data and try one more time.");
+
+            return BadRequest();
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "Some issues during get comments by user ID. Please, try one more time late.");
+
+            return StatusCode((int)(ex.StatusCode ?? HttpStatusCode.InternalServerError), ex.Message);
+        }
+    }
+
     [HttpGet("getByUserId/{id}")]
     public async Task<IActionResult> GetByUserId(Guid id)
     {
@@ -155,12 +181,12 @@ public class CommentController : ControllerBase
         }
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(Guid id)
+    [HttpDelete("documents/{documentId}/comments/{commentId}")]
+    public async Task<IActionResult> Delete(Guid documentId, Guid commentId)
     {
         try
         {
-            var responseMessage = await _httpClient.DeletAsync($"Comment/{id}");
+            var responseMessage = await _httpClient.DeletAsync($"Comment/documents/{documentId}/comments/{commentId}");
             responseMessage.EnsureSuccessStatusCode();
 
             return NoContent();

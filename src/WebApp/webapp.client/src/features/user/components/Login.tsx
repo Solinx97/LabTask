@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import type { LoginModel } from '../types/LoginModel';
 import { useTranslation } from 'react-i18next';
 
+import './User.scss';
+
 const Login = () => {
     const { t } = useTranslation('account');
 

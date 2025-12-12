@@ -1,4 +1,4 @@
-import { useCreateDocumentMutation } from '@/features/document/api/Dcoument.api';
+import { useCreateDocumentMutation } from '@/features/document/api/Document.api';
 import { useRef } from 'react';
 import type { DocumentModel } from '../types/DocumentModel';
 
@@ -30,13 +30,16 @@ const Create:React.FC<{ t: (key: string) => string, userId: string }> = ({ t, us
             <div className="title">{t("Create")}</div>
             <form className="create-document__action" onSubmit={createAsync}>
                 <div className="mb-3">
-                    <input className="form-control" type="text" placeholder="Name" ref={nameRef} required />
+                    <label htmlFor="name">{t("Name")}</label>
+                    <input className="form-control" type="text" name="name" placeholder={t("Name")} ref={nameRef} required />
                 </div>
                 <div className="mb-3">
-                    <textarea className="form-control" rows={6} ref={descriptiondRef} required />
+                    <label htmlFor="description">{t("Description")}</label>
+                    <textarea className="form-control" name="description" rows={6} ref={descriptiondRef} required />
                 </div>
                 <div className="mb-3">
-                    <input className="form-control" type="date" placeholder="Expires at" ref={expiresAtRef} required />
+                    <label htmlFor="expires">{t("ExpiresAt")}</label>
+                    <input className="form-control" type="date" name="expires" ref={expiresAtRef} required />
                 </div>
                 <div className="actions">
                     <input type="submit" className="btn-border-shadow" value={t("Create")} />

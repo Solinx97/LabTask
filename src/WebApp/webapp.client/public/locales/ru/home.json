@@ -4,6 +4,7 @@
   "Name": "Название",
   "Description": "Описание",
   "NoAnyDocuments": "Нет доступных документов",
+  "NoAnyComments": "Нет доступных комментариев",
   "Save": "Сохранить",
   "Cancel": "Отмена",
   "Delete": "Удалить",
@@ -11,7 +12,7 @@
   "AddComment": "Добавить комментарий",
   "CreateDocument": "Создать документ",
   "MyDocuments": "Мои документы",
-  "Search": "Поиск",
+  "SearchDocument": "Поиск документа",
   "History": "История",
   "Manage": "Управление"
 }

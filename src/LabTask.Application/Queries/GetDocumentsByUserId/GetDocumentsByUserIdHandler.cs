@@ -3,7 +3,7 @@ using LabTask.Infrastructure.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace LabTask.Application.Queries.GetDocument;
+namespace LabTask.Application.Queries.GetDocumentsByUserId;
 
 public class GetDocumentsByUserIdHandler(AppDbContext db) : IRequestHandler<GetDocumentsByUserIdQuery, IEnumerable<DocumentDto>>
 {

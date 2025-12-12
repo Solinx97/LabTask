@@ -38,14 +38,6 @@ ul {
     color: #57A6A1;
 }
 
-.card {
-    background: #0c192c;
-}
-
-code {
-    color: #E01A76;
-}
-
 .btn-primary {
     color: #fff;
     background-color: #1b6ec2;
@@ -71,6 +63,10 @@ code {
     background: transparent;
 }
 
+.btn-border-shadow.green {
+    box-shadow: 2px 2px 2px 2px #4BD2AE;
+}
+
 .btn-shadow_disabled {
     display: flex;
     align-items: center;
@@ -90,36 +86,4 @@ code {
 .box-shadow {
     box-shadow: 3px 3px 3px 3px gray;
     background: #0c192c;
-}
-
-.preview {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    box-shadow: 2px 2px 2px 2px #3AA6B9;
-    border-radius: 20px;
-    padding: 2em;
-    font-size: 1em;
-}
-
-.preview__responsibilities {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.preview__responsibilities .form-check-label {
-    opacity: 1 !important;
- }
-
-.load-more {
-    display: flex;
-    justify-content: flex-start;
-}
-
-.load-more__content {
-    cursor: pointer;
-    box-shadow: 1px 1px 1px 1px gray;
-    padding: 5px 10px;
-    border-radius: 10px;
 }
