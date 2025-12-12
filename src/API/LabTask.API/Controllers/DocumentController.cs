@@ -2,9 +2,10 @@
 using LabTask.Application.Commands.DeleteDocument;
 using LabTask.Application.Commands.UpdateDocument;
 using LabTask.Application.DTOs;
+using LabTask.Application.Queries.GetActualDocumentsByUserId;
 using LabTask.Application.Queries.GetAllDocuments;
 using LabTask.Application.Queries.GetDocument;
-using LabTask.Application.Queries.GetDocumentsByUserId;
+using LabTask.Application.Queries.GetHistoryByUserId;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -42,10 +43,18 @@ public class DocumentController(IMediator mediator) : ControllerBase
         return Ok(document);
     }
 
-    [HttpGet("getByUserId/{id}")]
-    public async Task<IActionResult> GetByUserId(Guid id)
+    [HttpGet("getActualByUserId/{id}")]
+    public async Task<IActionResult> GetActualByUserId(Guid id)
     {
-        var documents = await _mediator.Send(new GetDocumentsByUserIdQuery(id));
+        var documents = await _mediator.Send(new GetActualDocumentsByUserIdQuery(id));
+
+        return Ok(documents);
+    }
+
+    [HttpGet("getHustoryByUserId/{id}")]
+    public async Task<IActionResult> GetHistoryByUserUd(Guid id)
+    {
+        var documents = await _mediator.Send(new GetHistoryByUserIdQuery(id));
 
         return Ok(documents);
     }

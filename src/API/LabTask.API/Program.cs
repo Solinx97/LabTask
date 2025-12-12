@@ -16,7 +16,7 @@ builder.Services.AddInfrastructure(connection);
 
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
-builder.Services.AddApp();
+builder.Services.AddMediatorSource();
 
 var authenticationOptions = new Authentication();
 builder.Configuration.Bind("Authentication", authenticationOptions);

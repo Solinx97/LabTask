@@ -1,9 +1,9 @@
-import { useGetDocumentsByUserIdQuery } from '@/features/document/api/Document.api';
+import { useGetActualDocumentsByUserIdQuery } from '@/features/document/api/Document.api';
 import Loading from '@/features/shared/components/Loading';
 import Document from './Document';
 
 const Documents:React.FC<{ t: (key: string) => string, userId: string}> = ({ t, userId }) => {
-    const { data: myDocuments, isLoading } = useGetDocumentsByUserIdQuery(userId);
+    const { data: myDocuments, isLoading } = useGetActualDocumentsByUserIdQuery(userId);
 
     if (isLoading) {
         return (<Loading />);

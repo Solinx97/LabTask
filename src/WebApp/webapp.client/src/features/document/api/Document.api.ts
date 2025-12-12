@@ -54,8 +54,18 @@ export const DocumentApi = createApi({
             query: name => `/Document/getByName/${name}`,
             providesTags: result => result ? [{ type: 'Document', id: result.id }] : [],
         }),
-        getDocumentsByUserId: builder.query<DocumentModel[], string>({
-            query: userId => `/Document/getByUserId/${userId}`,
+        getActualDocumentsByUserId: builder.query<DocumentModel[], string>({
+            query: userId => `/Document/getActualByUserId/${userId}`,
+            providesTags: result =>
+                result
+                    ? [
+                        ...result.map(document => ({ type: 'Document' as const, id: document.id })),
+                        { type: 'Document', id: 'LIST' },
+                    ]
+                    : [{ type: 'Document', id: 'LIST' }],
+        }),
+        getHistoryDocumentsByUserId: builder.query<DocumentModel[], string>({
+            query: userId => `/Document/getHustoryByUserId/${userId}`,
             providesTags: result =>
                 result
                     ? [
@@ -73,5 +83,6 @@ export const {
     useDeleteDocumentMutation,
     useGetAllDocumentsQuery,
     useLazyGetDocumentByNameQuery,
-    useGetDocumentsByUserIdQuery,
+    useGetActualDocumentsByUserIdQuery,
+    useGetHistoryDocumentsByUserIdQuery,
 } = DocumentApi;

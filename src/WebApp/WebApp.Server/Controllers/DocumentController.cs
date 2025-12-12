@@ -100,12 +100,38 @@ public class DocumentController : ControllerBase
         }
     }
 
-    [HttpGet("getByUserId/{id}")]
-    public async Task<IActionResult> GetByUserId(Guid id)
+    [HttpGet("getActualByUserId/{id}")]
+    public async Task<IActionResult> GetActualByUserId(Guid id)
     {
         try
         {
-            var responseMessage = await _httpClient.GetAsync($"Document/getByUserId/{id}");
+            var responseMessage = await _httpClient.GetAsync($"Document/getActualByUserId/{id}");
+            responseMessage.EnsureSuccessStatusCode();
+
+            var documents = await responseMessage.Content.ReadFromJsonAsync<IEnumerable<DocumentModel>>();
+
+            return Ok(documents);
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
+        {
+            _logger.LogError(ex, "Some issues during get documents by user ID. Please, check your data and try one more time.");
+
+            return BadRequest();
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "Some issues during get documents by user ID. Please, try one more time late.");
+
+            return StatusCode((int)(ex.StatusCode ?? HttpStatusCode.InternalServerError), ex.Message);
+        }
+    }
+
+    [HttpGet("getHustoryByUserId/{id}")]
+    public async Task<IActionResult> GetHustoryByUserId(Guid id)
+    {
+        try
+        {
+            var responseMessage = await _httpClient.GetAsync($"Document/getHustoryByUserId/{id}");
             responseMessage.EnsureSuccessStatusCode();
 
             var documents = await responseMessage.Content.ReadFromJsonAsync<IEnumerable<DocumentModel>>();

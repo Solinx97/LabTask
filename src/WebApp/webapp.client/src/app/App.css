@@ -24,7 +24,7 @@ ul {
     color: white;
 }
 
-#root input[type=text], #root input[type=email], #root input[type=password], #root input[type=number], #root input[type=date], #root button, #root textarea {
+#root input[type=text], #root input[type=email], #root input[type=password], #root input[type=number], #root input[type=datetime-local], #root button, #root textarea {
     background: #0c192c;
     color: white;
     border: 1px solid #028391;

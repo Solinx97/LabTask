@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import Create from '@/features/document/components/Create';
 import Documents from '@/features/document/components/Documents';
 import Search from '@/features/document/components/Search';
+import History from '@/features/document/components/History';
 import { useSelector } from 'react-redux';
 
 import './Home.scss';
@@ -54,6 +55,12 @@ const Home: React.FC = () => {
                 }
                 {section === 2 &&
                     <Search
+                        t={t}
+                        userId={user?.id ?? ""}
+                    />
+                }
+                {section === 3 &&
+                    <History
                         t={t}
                         userId={user?.id ?? ""}
                     />

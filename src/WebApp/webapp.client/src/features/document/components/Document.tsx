@@ -59,6 +59,20 @@ const Document: React.FC<{ t: (key: string) => string, userId: string, document:
         }
     }
 
+    const getTime = (dateAsString: string) => {
+        const date = new Date(dateAsString);
+
+        const internationalMonth = date.getMonth() + 1;
+        const month = internationalMonth < 10 ? `0${internationalMonth}` : internationalMonth;
+        const day = date.getDay() < 10 ? `0${date.getDay()}` : date.getDay();
+        const hours = date.getHours() < 10 ? `0${date.getHours()}` : date.getHours();
+        const minutes = date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes();
+
+        const currentDate = `${date.getFullYear()}-${month}-${day} ${hours}:${minutes}:00`;
+
+        return currentDate;
+    }
+
     return (
         <>
             {(isEditMode && selectedDocumentId === document.id)
@@ -75,6 +89,7 @@ const Document: React.FC<{ t: (key: string) => string, userId: string, document:
                 <div className="documents__item">
                     <div>{t("Name")}: {document.name}</div>
                     <div>{t("Description")}: {document.description}</div>
+                    <div>{t("ExpireAt")}: {getTime(document.expireAt)}</div>
                     <div className="actions">
                         <button className="btn-border-shadow" onClick={async () => await deleteAsync(document.id)}>{t("Delete")}</button>
                         <button className="btn-border-shadow" onClick={() => updateHandle(document.id)}>{t("Update")}</button>
