@@ -1,6 +1,7 @@
 ﻿using LabTask.UserAPI.Consts;
 using LabTask.UserAPI.DTOs;
 using LabTask.UserAPI.Entities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -51,6 +52,7 @@ public class UserController(UserManager<ApplicationUser> userManager, SignInMana
     }
 
     [HttpPost("logout")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> Logout()
     {
         await _signInManager.SignOutAsync();
@@ -58,12 +60,13 @@ public class UserController(UserManager<ApplicationUser> userManager, SignInMana
         return Ok();
     }
 
-    [Authorize]
-    [HttpGet]
-    public IActionResult GetProfile()
+    [HttpGet("refresh")]
+    public async Task<IActionResult> Refresh()
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        var user = new { UserId = userId };
+        var header = HttpContext.Request.Headers.Authorization;
+        var token = header.ToString().Replace("Bearer ", "", StringComparison.OrdinalIgnoreCase);
+        var userId = GetUserId(token);
+        var user = await _userManager.FindByIdAsync(userId);
 
         return Ok(user);
     }
@@ -72,20 +75,36 @@ public class UserController(UserManager<ApplicationUser> userManager, SignInMana
     {
         var claims = new[]
         {
-        new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
-        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-    };
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim("scope", authentication.Scopes),
+        };
+
+        var audencies = authentication.Audiences.Split(',');
+        foreach (var auden in audencies)
+        {
+            claims = [.. claims, new Claim(JwtRegisteredClaimNames.Aud, auden)];
+        }
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authentication.Key));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
             issuer: authentication.Issuer,
-            audience: authentication.Audiences,
             claims: claims,
             expires: DateTime.Now.AddHours(1),
             signingCredentials: creds);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    private static string GetUserId(string tokenAsString)
+    {
+        var handler = new JwtSecurityTokenHandler();
+        var token = handler.ReadJwtToken(tokenAsString);
+
+        var userId = token.Claims.First(c => c.Type == JwtRegisteredClaimNames.Sub).Value;
+
+        return userId;
     }
 }

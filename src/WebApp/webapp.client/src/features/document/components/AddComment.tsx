@@ -1,0 +1,43 @@
+import type { CommentModel } from "../types/CommentModel";
+import { useCreateCommentMutation } from '@/features/document/api/Comment.api';
+import { useRef } from 'react';
+
+interface AddCommentProps {
+    t: (key: string) => string;
+    userId: string;
+    documentId: string;
+}
+
+const AddComment:React.FC<AddCommentProps> = ({ t, userId, documentId }) => {
+    const contentRef = useRef<HTMLTextAreaElement | null>(null);
+
+    const [createComment] = useCreateCommentMutation();
+
+    const createAsync = async () => {
+        try {
+            const comment: CommentModel = {
+                id: crypto.randomUUID(),
+                content: contentRef.current ? contentRef.current.value : "",
+                documentId: documentId,
+                userId: userId
+            };
+                
+            await createComment(comment).unwrap();
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    return (
+        <form className="add-comment" onSubmit={createAsync}>
+            <div className="mb-3">
+                <textarea className="form-control" rows={6} ref={contentRef} required />
+            </div>
+            <div className="actions">
+                <input type="submit" className="btn-border-shadow" value={t("Save")} />
+            </div>
+        </form>
+    );
+}
+
+export default AddComment;

@@ -13,7 +13,7 @@ internal class UpdateDocumentHandler(IGenericRepository<Document> repository, IU
     {
         var doc = await _repository.GetByIdAsync(request.Id);
 
-        doc.Update(request.Name, request.Description);
+        doc.Edit(request.Name, request.Description);
 
         await _unitOfWork.SaveChangesAsync(ct);
     }

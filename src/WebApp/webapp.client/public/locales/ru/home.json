@@ -2,5 +2,16 @@
   "Documents": "Документы",
   "Get": "Получить",
   "Name": "Название",
-  "Description": "Описание"
+  "Description": "Описание",
+  "NoAnyDocuments": "Нет доступных документов",
+  "Save": "Сохранить",
+  "Cancel": "Отмена",
+  "Delete": "Удалить",
+  "Update": "Обновить",
+  "AddComment": "Добавить комментарий",
+  "CreateDocument": "Создать документ",
+  "MyDocuments": "Мои документы",
+  "Search": "Поиск",
+  "History": "История",
+  "Manage": "Управление"
 }

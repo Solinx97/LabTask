@@ -7,6 +7,7 @@ export const DocumentApi = createApi({
     reducerPath: 'documentApi',
     tagTypes: [
         'Document',
+        'Comment',
     ],
     baseQuery: fetchBaseQuery({
         baseUrl: apiURL

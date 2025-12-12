@@ -16,7 +16,7 @@ const Home: React.FC = () => {
     const [section, setSection] = useState(-1);
 
     const getMenu = () => {
-        const menu = ["Create document", "My documents", "Searching", "History", "Manage"];
+        const menu = [t("CreateDocument"), t("MyDocuments"), t("Search"), t("History"), t("Manage")];
 
         if (user) {
             return (
@@ -43,13 +43,13 @@ const Home: React.FC = () => {
                 {section === 0 &&
                     <Create
                         t={t}
-                        user={user}
+                        userId={user?.id ?? ""}
                     />
                 }
                 {section === 1 &&
                     <Documents
                         t={t}
-                        user={user}
+                        userId={user?.id ?? ""}
                     />
                 }
                 {section === 2 &&

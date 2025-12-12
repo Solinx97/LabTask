@@ -1,4 +1,4 @@
-import { useLazyGetDocumentByIdQuery } from '@/features/document/api/Document.api';
+import { useLazyGetDocumentByIdQuery } from '@/features/document/api/Dcoument.api';
 import type { DocumentModel } from '@/features/document/types/DocumentModel';
 import { useRef, useState } from 'react';
 

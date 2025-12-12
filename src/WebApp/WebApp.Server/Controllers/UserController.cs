@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Net;
+using WebApp.Server.Attributes;
 using WebApp.Server.Consts;
 using WebApp.Server.Enums;
 using WebApp.Server.Interfaces;
@@ -86,6 +87,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("logout")]
+    [ServiceFilter(typeof(RequireAccessTokenAttribute))]
     public async Task<IActionResult> Logout()
     {
         try
@@ -111,25 +113,28 @@ public class UserController : ControllerBase
         }
     }
 
-    [HttpGet]
-    public async Task<IActionResult> Profile()
+    [HttpGet("refresh")]
+    [ServiceFilter(typeof(RequireAccessTokenAttribute))]
+    public async Task<IActionResult> Refresh()
     {
         try
         {
-            var responseMessage = await _httpClient.GetAsync("User");
+            var responseMessage = await _httpClient.GetAsync("User/refresh");
             responseMessage.EnsureSuccessStatusCode();
 
-            return Ok();
+            var user = await responseMessage.Content.ReadFromJsonAsync<UserModel>();
+
+            return Ok(user);
         }
         catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
         {
-            _logger.LogError(ex, "Some issues during Login. Please, check your data and try one more time.");
+            _logger.LogError(ex, "Some issues during Logout. Please, check your data and try one more time.");
 
             return BadRequest();
         }
         catch (HttpRequestException ex)
         {
-            _logger.LogError(ex, "Some issues during Login. Please, try one more time late.");
+            _logger.LogError(ex, "Some issues during Logout. Please, try one more time late.");
 
             return StatusCode((int)(ex.StatusCode ?? HttpStatusCode.InternalServerError), ex.Message);
         }

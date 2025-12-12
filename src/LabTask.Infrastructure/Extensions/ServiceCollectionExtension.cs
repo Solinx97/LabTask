@@ -1,5 +1,6 @@
 ﻿using LabTask.Domain.Aggregates;
 using LabTask.Domain.Data;
+using LabTask.Domain.Entities;
 using LabTask.Infrastructure.Data;
 using LabTask.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +17,8 @@ public static class ServiceCollectionExtension
             options.UseSqlServer(connectionString);
         });
 
-        services.AddScoped<IGenericRepository<Document>, GenericRepository>();
+        services.AddScoped<IGenericRepository<Document>, GenericRepository<Document>>();
+        services.AddScoped<IGenericRepository<Comment>, GenericRepository<Comment>>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
     }
 }

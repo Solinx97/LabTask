@@ -1,4 +1,5 @@
 using LabTask.API.Consts;
+using LabTask.API.Middlewares;
 using LabTask.Application.Extensions;
 using LabTask.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -20,19 +21,20 @@ builder.Services.AddApp();
 var authenticationOptions = new Authentication();
 builder.Configuration.Bind("Authentication", authenticationOptions);
 
+var audiences = authenticationOptions.Audiences.Split(',');
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
             ValidIssuer = authenticationOptions.Issuer,
-            ValidAudience = authenticationOptions.Audiences,
-            IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(authenticationOptions.Key))
+            ValidateAudience = true,
+            ValidAudiences = audiences,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authenticationOptions.Key)),
+            ClockSkew = TimeSpan.Zero
         };
         // Skip check HTTPS (should be HTTPS in production)
         options.RequireHttpsMetadata = false;
@@ -102,8 +104,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 app.Run();

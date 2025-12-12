@@ -32,6 +32,7 @@ export default defineConfig(({ mode }) => {
             proxy: {
                 [`^/api/${apiVersion}/User`]: { target, secure: false },
                 [`^/api/${apiVersion}/Document`]: { target, secure: false },
+                [`^/api/${apiVersion}/Comment`]: { target, secure: false },
             },
             port: parseInt(env.DEV_SERVER_PORT || '63149'),
         }

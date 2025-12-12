@@ -1,6 +1,17 @@
 {
   "Documents": "Documents",
   "Get": "Get",
-  "Name": "English",
-  "Description": "Registration"
+  "Name": "Name",
+  "Description": "Description",
+  "NoAnyDocuments": "No any documents",
+  "Save": "Save",
+  "Cancel": "Cancel",
+  "Delete": "Delete",
+  "Update": "Update",
+  "AddComment": "Add comment",
+  "CreateDocument": "Create document",
+  "MyDocuments": "My documents",
+  "Search": "Search",
+  "History": "History",
+  "Manage": "Manage"
 }

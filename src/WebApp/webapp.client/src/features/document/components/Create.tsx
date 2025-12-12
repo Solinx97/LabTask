@@ -1,9 +1,8 @@
-import { useCreateDocumentMutation } from '@/features/document/api/Document.api';
+import { useCreateDocumentMutation } from '@/features/document/api/Dcoument.api';
 import { useRef } from 'react';
 import type { DocumentModel } from '../types/DocumentModel';
-import type { UserModel } from '@/features/user/types/UserModel';
 
-const Create:React.FC<{ t: (key: string) => string, user: UserModel | null}> = ({ t, user }) => {
+const Create:React.FC<{ t: (key: string) => string, userId: string }> = ({ t, userId }) => {
     const nameRef = useRef<HTMLInputElement | null>(null);
     const descriptiondRef = useRef<HTMLTextAreaElement | null>(null);
     const expiresAtRef = useRef<HTMLInputElement | null>(null);
@@ -17,7 +16,7 @@ const Create:React.FC<{ t: (key: string) => string, user: UserModel | null}> = (
                 name: nameRef.current ? nameRef.current.value : "",
                 description: descriptiondRef.current ? descriptiondRef.current.value : "",
                 expireAt: expiresAtRef.current ? expiresAtRef.current.value : "",
-                userId: user ? user.id : ""
+                userId: userId
             };
 
             await createDocument(document).unwrap();
@@ -27,9 +26,9 @@ const Create:React.FC<{ t: (key: string) => string, user: UserModel | null}> = (
     }
 
     return (
-        <div>
+        <div className="create-document">
             <div className="title">{t("Create")}</div>
-            <form className="login" onSubmit={createAsync}>
+            <form className="create-document__action" onSubmit={createAsync}>
                 <div className="mb-3">
                     <input className="form-control" type="text" placeholder="Name" ref={nameRef} required />
                 </div>

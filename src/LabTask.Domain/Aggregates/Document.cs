@@ -1,7 +1,12 @@
-﻿namespace LabTask.Domain.Aggregates;
+﻿using LabTask.Domain.Entities;
+using LabTask.Domain.Interfaces;
 
-public class Document
+namespace LabTask.Domain.Aggregates;
+
+public class Document : IEntityId
 {
+    private readonly List<Comment> _comments = [];
+
     public const int NAME_MAX_LENGTH = 128;
 
     private Document() {}
@@ -25,6 +30,8 @@ public class Document
 
     public Guid UserId { get; private set; }
 
+    public IReadOnlyCollection<Comment> Comments => _comments.AsReadOnly();
+
     public static Document Create(string name, string description, DateTimeOffset expireAt, Guid userId)
     {
         ArgumentException.ThrowIfNullOrEmpty(name, nameof(name));
@@ -36,7 +43,7 @@ public class Document
         return new Document(name, description, expireAt, userId);
     }
 
-    public void Update(string name, string description)
+    public void Edit(string name, string description)
     {
         if (!string.IsNullOrEmpty(name) && !string.Equals(name, Name, StringComparison.OrdinalIgnoreCase))
         {
