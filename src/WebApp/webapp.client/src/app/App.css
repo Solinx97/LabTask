@@ -67,6 +67,10 @@ ul {
     box-shadow: 2px 2px 2px 2px #4BD2AE;
 }
 
+.btn-border-shadow.orange {
+    box-shadow: 2px 2px 2px 2px #E3DB5D;
+}
+
 .btn-shadow_disabled {
     display: flex;
     align-items: center;

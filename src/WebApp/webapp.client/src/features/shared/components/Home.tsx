@@ -8,6 +8,7 @@ import History from '@/features/document/components/History';
 import { useSelector } from 'react-redux';
 
 import './Home.scss';
+import Manage from '@/features/document/components/Manage';
 
 const Home: React.FC = () => {
     const { t } = useTranslation('home');
@@ -35,8 +36,8 @@ const Home: React.FC = () => {
         }
     }
 
-    const getTime = (dateAsString: string) => {
-        const date = new Date(dateAsString);
+    const getTime = (dateAsString?: string) => {
+        const date = dateAsString ? new Date(dateAsString) : new Date();
 
         const internationalMonth = date.getMonth() + 1;
         const month = internationalMonth < 10 ? `0${internationalMonth}` : internationalMonth;
@@ -59,6 +60,7 @@ const Home: React.FC = () => {
                     <Create
                         t={t}
                         userId={user?.id ?? ""}
+                        getTime={getTime}
                     />
                 }
                 {section === 1 &&
@@ -76,6 +78,13 @@ const Home: React.FC = () => {
                 }
                 {section === 3 &&
                     <History
+                        t={t}
+                        userId={user?.id ?? ""}
+                        getTime={getTime}
+                    />
+                }
+                {section === 4 &&
+                    <Manage
                         t={t}
                         userId={user?.id ?? ""}
                         getTime={getTime}

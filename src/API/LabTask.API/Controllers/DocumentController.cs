@@ -4,6 +4,7 @@ using LabTask.Application.Commands.UpdateDocument;
 using LabTask.Application.DTOs;
 using LabTask.Application.Queries.GetActualDocumentsByUserId;
 using LabTask.Application.Queries.GetDocument;
+using LabTask.Application.Queries.GetDocumentByName;
 using LabTask.Application.Queries.GetHistoryByUserId;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -26,10 +27,18 @@ public class DocumentController(IMediator mediator) : ControllerBase
         return Ok();
     }
 
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(Guid id)
+    {
+        var document = await _mediator.Send(new GetDocumentQuery(id));
+
+        return Ok(document);
+    }
+
     [HttpGet("getByName/{name}")]
     public async Task<IActionResult> GetByName(string name)
     {
-        var document = await _mediator.Send(new GetDocumentQuery(name));
+        var document = await _mediator.Send(new GetDocumentByNameQuery(name));
 
         return Ok(document);
     }

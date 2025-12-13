@@ -8,10 +8,22 @@ interface Props {
     t: (key: string) => string;
     userId: string;
     document: DocumentModel;
-    getTime: (dateAsString: string) => string;
+    getTime: (dateAsString?: string) => string;
+    getDocumentLinks?: (document: DocumentModel | null) => void;
+    commentsAllow?: boolean;
+    addCommentsAllow?: boolean;
+    updateAllow?: boolean;
+    deleteAllow?: boolean;
+    commentActionsAllow?: boolean;
+    linksAllow?: boolean;
 }
 
-const Document: React.FC<Props> = ({ t, userId, document, getTime }) => {
+const Document: React.FC<Props> = ({ 
+    t, userId, document,
+    getTime, getDocumentLinks, commentsAllow = true, 
+    addCommentsAllow = true, updateAllow = true, deleteAllow = true,
+    commentActionsAllow = true, linksAllow = true 
+}) => {
     const [deleteDocument] = useDeleteDocumentMutation();
     const [updateDocument] = useUpdateDocumentMutation();
 
@@ -21,6 +33,7 @@ const Document: React.FC<Props> = ({ t, userId, document, getTime }) => {
     const [isEditMode, setIsEditMode] = useState(false);
     const [isOpenAddComment, setIsOpenAddComment] = useState(false);
     const [isOpenComments, setIsOpenComments] = useState(false);
+
     const [selectedDocumentId, setSelectedDocumentId] = useState("");
 
     const updateHandle = (id: string) => {
@@ -66,6 +79,12 @@ const Document: React.FC<Props> = ({ t, userId, document, getTime }) => {
         }
     }
 
+    const getDocumentLinksHandler = () => {
+        if (getDocumentLinks) {
+            getDocumentLinks(document);
+        }
+    }
+
     return (
         <>
             {(isEditMode && selectedDocumentId === document.id)
@@ -80,17 +99,30 @@ const Document: React.FC<Props> = ({ t, userId, document, getTime }) => {
                 </div>
                 :
                 <div className="container">
+                    {linksAllow &&
+                        <button className="btn-border-shadow links" onClick={getDocumentLinksHandler}>{t("Links")}</button>
+                    }
                     <div className="title" title={document.name}>{document.name}</div>
                     <div className="description">{document.description}</div>
                     <div className="expire-at">{getTime(document.expireAt)}</div>
                     <div className="actions">
-                        <button className="btn-border-shadow" onClick={async () => await deleteAsync(document.id)}>{t("Delete")}</button>
-                        <button className="btn-border-shadow" onClick={() => updateHandle(document.id)}>{t("Update")}</button>
-                        <button className={`btn-border-shadow ${isOpenComments && selectedDocumentId === document.id ? 'green' : ''}`} onClick={() => commentsHandle(document.id)}>{t("Comments")}</button>
+                        {deleteAllow &&
+                            <button className="btn-border-shadow" onClick={async () => await deleteAsync(document.id)}>{t("Delete")}</button>
+                        }
+                        {updateAllow &&
+                            <button className="btn-border-shadow" onClick={() => updateHandle(document.id)}>{t("Update")}</button>
+                        }
+                        {commentsAllow &&
+                            <button className={`btn-border-shadow ${isOpenComments && selectedDocumentId === document.id ? 'green' : ''}`} onClick={() => commentsHandle(document.id)}>{t("Comments")}</button>
+                        }
                     </div>
-                    {(isOpenAddComment && selectedDocumentId === document.id)
-                        ? <div className="open-comments" onClick={() => addCommentHandle()}>{t("Cancel")}</div>
-                        : <div className="open-comments" onClick={() => addCommentHandle(document.id)}>{t("AddComment")}</div>
+                    {addCommentsAllow &&
+                        <>
+                            {(isOpenAddComment && selectedDocumentId === document.id)
+                                ? <div className="open-comments" onClick={() => addCommentHandle()}>{t("Cancel")}</div>
+                                : <div className="open-comments" onClick={() => addCommentHandle(document.id)}>{t("AddComment")}</div>
+                            }
+                        </>
                     }
                 </div>
             }
@@ -105,6 +137,8 @@ const Document: React.FC<Props> = ({ t, userId, document, getTime }) => {
                 <Comments
                     t={t}
                     documentId={document.id}
+                    userId={userId}
+                    actionsAllow={commentActionsAllow}
                 />
             }
         </>

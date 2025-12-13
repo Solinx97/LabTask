@@ -3,30 +3,39 @@ import Loading from '@/features/shared/components/Loading';
 import Document from './Document';
 import { useEffect, useRef, useState } from 'react';
 import InfiniteScrollTrigger from '@/events/InfiniteScrollTrigger';
+import Links from './Links';
 import type { DocumentModel } from '../types/DocumentModel';
 
-const Documents: React.FC<{ t: (key: string) => string, userId: string, getTime: (dateAsString: string) => string }> = ({ t, userId, getTime }) => {
+interface Props {
+    t: (key: string) => string;
+    userId: string;
+    getTime: (dateAsString?: string) => string;
+}
+
+const Documents: React.FC<Props> = ({ t, userId, getTime }) => {
     const pageSizeRef = useRef<number>(5);
 
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(false);
-    const [documents, setDocuments] = useState<DocumentModel[]>([]);
+    const [isOpenLinks, setIsOpenLinks] = useState(false);
+    const [selectedDocument, setSelectedDocument] = useState<DocumentModel | null>(null);
 
-    const { data: uploadedDocuments, isLoading } = useGetActualDocumentsByUserIdQuery({ userId, page: page, pageSize: pageSizeRef.current });
-
-    useEffect(() => {
-        setHasMore((page * pageSizeRef.current) < documents.length);
-    }, [page, documents]);
+    const { data: documents, isLoading } = useGetActualDocumentsByUserIdQuery({ userId, page: page, pageSize: pageSizeRef.current });
 
     useEffect(() => {
-        if (!uploadedDocuments) {
+        if (!documents) {
             return;
         }
 
-        setDocuments(prev => prev = [...prev, ...uploadedDocuments]);
-    }, [uploadedDocuments]);
+        setHasMore((page * pageSizeRef.current) < documents.length);
+    }, [page, documents]);
 
-    if (isLoading) {
+    const getDocumentLinks = (document: DocumentModel | null) => {
+        setIsOpenLinks(true);
+        setSelectedDocument(document);
+    }
+
+    if (isLoading || !documents) {
         return (<Loading />);
     }
 
@@ -41,6 +50,7 @@ const Documents: React.FC<{ t: (key: string) => string, userId: string, getTime:
                             userId={userId}
                             document={document}
                             getTime={getTime}
+                            getDocumentLinks={getDocumentLinks}
                         />
                     </li>
                 ))}
@@ -52,6 +62,15 @@ const Documents: React.FC<{ t: (key: string) => string, userId: string, getTime:
                         />
                     </li>
                 </ul>
+            }
+            {isOpenLinks &&
+                <Links
+                    t={t}
+                    getTime={getTime}
+                    userId={userId}
+                    document={selectedDocument}
+                    setIsOpenLinks={setIsOpenLinks}
+                />
             }
         </>
     );

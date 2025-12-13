@@ -10,7 +10,7 @@ public class GetActualDocumentsByUserIdHandler(AppDbContext db) : IRequestHandle
 {
     private readonly AppDbContext _db = db;
 
-    public async Task<IEnumerable<DocumentDto>> Handle(GetActualDocumentsByUserIdQuery request, CancellationToken cancellationToken)
+    public async Task<IEnumerable<DocumentDto>> Handle(GetActualDocumentsByUserIdQuery request, CancellationToken ct)
     {
         var now = DateTimeOffset.UtcNow;
 
@@ -19,7 +19,7 @@ public class GetActualDocumentsByUserIdHandler(AppDbContext db) : IRequestHandle
             .Select(o => new DocumentDto(o.Id, o.Name, o.Description, o.ExpireAt, o.UserId))
             .Skip(request.Page * request.PageSize)
             .Take(request.PageSize)
-            .ToListAsync();
+            .ToListAsync(ct);
 
         return documents;
     }

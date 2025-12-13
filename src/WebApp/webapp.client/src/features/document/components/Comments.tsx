@@ -4,14 +4,20 @@ import { useEffect, useRef, useState } from 'react';
 import type { CommentModel } from '../types/CommentModel';
 import InfiniteScrollTrigger from '@/events/InfiniteScrollTrigger';
 
-const Comments: React.FC<{ t: (key: string) => string, documentId: string, actionsAllow?: false }> = ({ t, documentId, actionsAllow = true }) => {
+interface Props {
+    t: (key: string) => string;
+    documentId: string;
+    userId: string;
+    actionsAllow?: boolean;
+}
+
+const Comments: React.FC<Props> = ({ t, documentId, userId, actionsAllow = true }) => {
     const pageSizeRef = useRef<number>(5);
 
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(false);
-    const [comments, setComments] = useState<CommentModel[]>([]);
 
-    const { data: uploadedComments, isLoading } = useGetCommentsByDocumentIdQuery({ documentId, page: page, pageSize: pageSizeRef.current });
+    const { data: comments, isLoading } = useGetCommentsByDocumentIdQuery({ documentId, page: page, pageSize: pageSizeRef.current });
     const [updateComment] = useUpdateCommentMutation();
     const [deleteComment] = useDeleteCommentMutation();
 
@@ -21,16 +27,12 @@ const Comments: React.FC<{ t: (key: string) => string, documentId: string, actio
     const [selectedCommentId, setSelectedCommentId] = useState("");
 
     useEffect(() => {
-        setHasMore((page * pageSizeRef.current) < comments.length);
-    }, [page, comments]);
-
-    useEffect(() => {
-        if (!uploadedComments) {
+        if (!comments) {
             return;
         }
 
-        setComments(prev => prev = [...prev, ...uploadedComments]);
-    }, [uploadedComments]);
+        setHasMore((page * pageSizeRef.current) < comments.length);
+    }, [page, comments]);
 
     const updateHandle = (id: string) => {
         setSelectedCommentId(id);
@@ -63,7 +65,7 @@ const Comments: React.FC<{ t: (key: string) => string, documentId: string, actio
         }
     }
 
-    if (isLoading) {
+    if (isLoading || !comments) {
         return (<Loading />);
     }
 
@@ -85,7 +87,7 @@ const Comments: React.FC<{ t: (key: string) => string, documentId: string, actio
                             :
                             <div className="container">
                                 <div>{comment.content}</div>
-                                {actionsAllow &&
+                                {(actionsAllow && comment.userId === userId) &&
                                     <div className="actions">
                                         <button className="btn-border-shadow" onClick={async () => await deleteAsync(comment.id)}>{t("Delete")}</button>
                                         <button className="btn-border-shadow" onClick={() => updateHandle(comment.id)}>{t("Update")}</button>

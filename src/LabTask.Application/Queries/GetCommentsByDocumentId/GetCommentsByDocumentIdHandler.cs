@@ -3,13 +3,13 @@ using LabTask.Infrastructure.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace LabTask.Application.Queries.GetAllComments;
+namespace LabTask.Application.Queries.GetCommentsByDocumentId;
 
-internal class GetAllCommentsHandler(AppDbContext db) : IRequestHandler<GetAllCommentsQuery, IEnumerable<CommentDto>>
+internal class GetCommentsByDocumentIdHandler(AppDbContext db) : IRequestHandler<GetCommentsByDocumentIdQuery, IEnumerable<CommentDto>>
 {
     private readonly AppDbContext _db = db;
 
-    public async Task<IEnumerable<CommentDto>> Handle(GetAllCommentsQuery request, CancellationToken cancellationToken)
+    public async Task<IEnumerable<CommentDto>> Handle(GetCommentsByDocumentIdQuery request, CancellationToken ct)
     {
         var comments = await _db.Document
             .Where(d => d.Id == request.DocumentId)
@@ -17,7 +17,7 @@ internal class GetAllCommentsHandler(AppDbContext db) : IRequestHandler<GetAllCo
             .Select(c => new CommentDto(c.Id, c.Content, c.DocumentId, c.UserId))
             .Skip(request.Page * request.PageSize)
             .Take(request.PageSize)
-            .ToListAsync(cancellationToken);
+            .ToListAsync(ct);
 
         return comments;
     }

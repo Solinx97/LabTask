@@ -1,9 +1,9 @@
 ﻿using LabTask.Application.DTOs;
 using MediatR;
 
-namespace LabTask.Application.Queries.GetAllComments;
+namespace LabTask.Application.Queries.GetCommentsByDocumentId;
 
-public record GetAllCommentsQuery(
+public record GetCommentsByDocumentIdQuery(
     Guid DocumentId,
     int Page,
     int PageSize

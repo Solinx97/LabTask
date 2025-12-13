@@ -2,7 +2,7 @@
 using LabTask.Application.Commands.DeleteComment;
 using LabTask.Application.Commands.UpdateComment;
 using LabTask.Application.DTOs;
-using LabTask.Application.Queries.GetAllComments;
+using LabTask.Application.Queries.GetCommentsByDocumentId;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -27,7 +27,7 @@ public class CommentController(IMediator mediator) : ControllerBase
     [HttpGet("getByDocumentId/{id}")]
     public async Task<IActionResult> GetByDocumentId(Guid id, int page, int pageSize)
     {
-        var comments = await _mediator.Send(new GetAllCommentsQuery(id, page, pageSize));
+        var comments = await _mediator.Send(new GetCommentsByDocumentIdQuery(id, page, pageSize));
 
         return Ok(comments);
     }

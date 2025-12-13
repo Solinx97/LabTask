@@ -4,6 +4,5 @@ namespace WebApp.Server.Models;
 
 public record UserModel(
     [Required] Guid Id,
-    [Required] string Email,
-    [Required] string Password
+    [Required] string Email
     );

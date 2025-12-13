@@ -14,7 +14,7 @@ internal class DeleteCommentHandler(IDocumentRepository repository, IUnitOfWork 
         var document = await _repository.GetByIdAsync(request.DocumentId, request.Id, ct) 
             ?? throw new DomainException($"Document {request.DocumentId} not found");
 
-        document?.RemoveComment(request.Id);
+        document?.DeleteComment(request.Id);
 
         await _unitOfWork.SaveChangesAsync(ct);
     }

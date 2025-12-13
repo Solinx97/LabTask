@@ -58,6 +58,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             setIsAuthenticated(false);
 
             navigate("/");
+
+            location.reload();
         } catch (e) {
             console.log(e);
         }

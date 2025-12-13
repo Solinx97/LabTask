@@ -36,9 +36,10 @@ public class Document : IEntityId
     public static Document Create(string name, string description, DateTimeOffset expireAt, Guid userId)
     {
         ArgumentException.ThrowIfNullOrEmpty(name, nameof(name));
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(name.Length, NAME_MAX_LENGTH, nameof(name));
         ArgumentNullException.ThrowIfNull(description, nameof(description));
         ArgumentNullException.ThrowIfNull(userId, nameof(userId));
+
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(name.Length, NAME_MAX_LENGTH, nameof(name));
 
         DocumentExpireAtExcepction.ThrowIfPastTime(expireAt);
 
@@ -47,21 +48,18 @@ public class Document : IEntityId
 
     public void AddComment(string content, Guid userId)
     {
-        ArgumentException.ThrowIfNullOrEmpty(content, nameof(content));
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(content.Length, Comment.CONTENT_MAX_LENGTH, nameof(content));
-
         var comment = Comment.Create(content, Id, userId);
         _comments.Add(comment);
     }
 
-    public void RemoveComment(Guid commentId)
+    public void DeleteComment(Guid commentId)
     {
         _comments.RemoveAll(c => c.Id == commentId);
     }
 
     public void EditComment(string content, Guid commentId)
     {
-        var comment = _comments.Where(c => c.Id == commentId).SingleOrDefault();
+        var comment = _comments.SingleOrDefault(c => c.Id == commentId);
         if (comment != null)
         {
             comment.Edit(content);

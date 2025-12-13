@@ -35,6 +35,16 @@ export const UserApi = createApi({
                 method: 'POST'
             }),
         }),
+        users: builder.query<UserModel[], void>({
+            query: () => '/User',
+            providesTags: result =>
+                result
+                    ? [
+                        ...result.map(user => ({ type: 'User' as const, id: user.id })),
+                        { type: 'User', id: 'LIST' },
+                    ]
+                    : [{ type: 'User', id: 'LIST' }],
+        }),
         refresh: builder.query<UserModel, void>({
             query: () => '/User/refresh',
             providesTags: result => result ? [{ type: 'User', id: result.id }] : [],
@@ -46,5 +56,6 @@ export const {
     useRegistrationMutation,
     useLoginMutation,
     useLogoutMutation,
+    useUsersQuery,
     useLazyRefreshQuery,
 } = UserApi;

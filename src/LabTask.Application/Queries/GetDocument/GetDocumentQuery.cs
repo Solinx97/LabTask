@@ -4,5 +4,5 @@ using MediatR;
 namespace LabTask.Application.Queries.GetDocument;
 
 public record GetDocumentQuery(
-    string Name
+    Guid Id
     ) : IRequest<DocumentDto>;

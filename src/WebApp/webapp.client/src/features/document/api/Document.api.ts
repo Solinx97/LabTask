@@ -8,6 +8,7 @@ export const DocumentApi = createApi({
     tagTypes: [
         'Document',
         'Comment',
+        'Link',
     ],
     baseQuery: fetchBaseQuery({
         baseUrl: apiURL
@@ -29,9 +30,38 @@ export const DocumentApi = createApi({
                 url: `/Document/${document.id}`,
                 method: 'PATCH'
             }),
-            invalidatesTags: (result, error, { id }) => [
-                { type: "Document", id },
-            ]
+            async onQueryStarted(document, { dispatch, queryFulfilled }) {
+                const patches = [
+                    dispatch(
+                        DocumentApi.util.updateQueryData(
+                            'getActualDocumentsByUserId',
+                            { userId: document.userId },
+                            draft => {
+                                const doc = draft.find(d => d.id === document.id);
+                                if (doc) {
+                                    Object.assign(doc, document);
+                                }
+                            }
+                        )
+                    ),
+                    dispatch(
+                        DocumentApi.util.updateQueryData(
+                            'getDocumentById',
+                            document.id,
+                            draft => {
+                                if (draft) {
+                                    Object.assign(draft, document);
+                                }
+                            }
+                        )
+                    ),
+                ];
+                try {
+                    await queryFulfilled;
+                } catch {
+                    patches.forEach(p => p.undo());
+                }
+            }
         }),
         deleteDocument: builder.mutation<void, string>({
             query: id => ({
@@ -50,12 +80,28 @@ export const DocumentApi = createApi({
                     ]
                     : [{ type: 'Document', id: 'LIST' }],
         }),
+        getDocumentById: builder.query<DocumentModel, string>({
+            query: id => `/Document/${id}`,
+            providesTags: result => result ? [{ type: 'Document', id: result.id }] : [],
+        }),
         getDocumentByName: builder.query<DocumentModel, string>({
             query: name => `/Document/getByName/${name}`,
             providesTags: result => result ? [{ type: 'Document', id: result.id }] : [],
         }),
         getActualDocumentsByUserId: builder.query<DocumentModel[], { userId: string, page: number, pageSize: number }>({
             query: ({ userId, page, pageSize }) => `/Document/getActualByUserId/${userId}?page=${page}&pageSize=${pageSize}`,
+            serializeQueryArgs: ({ endpointName, queryArgs }) => `${endpointName}-${queryArgs.userId}`,
+            merge: (currentCache, newItems) => {
+                newItems.forEach(item => {
+                    const index = currentCache.findIndex(d => d.id === item.id);
+                    if (index === -1) {
+                        currentCache.push(item);
+                    } else {
+                        currentCache[index] = item;
+                    }
+                });
+            },
+            forceRefetch: ({ currentArg, previousArg }) => currentArg?.page !== previousArg?.page,
             providesTags: result =>
                 result
                     ? [
@@ -66,6 +112,18 @@ export const DocumentApi = createApi({
         }),
         getHistoryDocumentsByUserId: builder.query<DocumentModel[], { userId: string, page: number, pageSize: number }>({
             query: ({ userId, page, pageSize }) => `/Document/getHustoryByUserId/${userId}?page=${page}&pageSize=${pageSize}`,
+            serializeQueryArgs: ({ endpointName, queryArgs }) => `${endpointName}-${queryArgs.userId}`,
+            merge: (currentCache, newItems) => {
+                newItems.forEach(item => {
+                    const index = currentCache.findIndex(d => d.id === item.id);
+                    if (index === -1) {
+                        currentCache.push(item);
+                    } else {
+                        currentCache[index] = item;
+                    }
+                });
+            },
+            forceRefetch: ({ currentArg, previousArg }) => currentArg?.page !== previousArg?.page,
             providesTags: result =>
                 result
                     ? [
@@ -82,6 +140,7 @@ export const {
     useUpdateDocumentMutation,
     useDeleteDocumentMutation,
     useGetAllDocumentsQuery,
+    useGetDocumentByIdQuery,
     useLazyGetDocumentByNameQuery,
     useGetActualDocumentsByUserIdQuery,
     useLazyGetActualDocumentsByUserIdQuery,

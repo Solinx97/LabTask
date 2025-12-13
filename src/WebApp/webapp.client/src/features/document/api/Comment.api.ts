@@ -4,8 +4,8 @@ import { DocumentApi } from './Document.api';
 export const CommentApi = DocumentApi.injectEndpoints({
     endpoints: builder => ({
         createComment: builder.mutation<void, CommentModel>({
-            query: Comment => ({
-                body: Comment,
+            query: comment => ({
+                body: comment,
                 url: '/Comment',
                 method: 'POST'
             }),
@@ -14,14 +14,30 @@ export const CommentApi = DocumentApi.injectEndpoints({
             ]
         }),
         updateComment: builder.mutation<void, CommentModel>({
-            query: Comment => ({
-                body: Comment,
-                url: `/Comment/${Comment.id}`,
+            query: comment => ({
+                body: comment,
+                url: `/Comment/${comment.id}`,
                 method: 'PATCH'
             }),
-            invalidatesTags: (result, error, { id }) => [
-                { type: "Comment", id },
-            ]
+            async onQueryStarted(comment, { dispatch, queryFulfilled }) {
+                const patchResult = dispatch(
+                    CommentApi.util.updateQueryData(
+                        'getCommentsByDocumentId',
+                        { documentId: comment.documentId },
+                        draft => {
+                            const com = draft.find(c => c.id === comment.id);
+                            if (com) {
+                                Object.assign(com, comment);
+                            }
+                        }
+                    )
+                );
+                try {
+                    await queryFulfilled;
+                } catch {
+                    patchResult.undo();
+                }
+            }
         }),
         deleteComment: builder.mutation<void, { documentId: string, commentId: string }>({
             query: ({ documentId, commentId }) => ({
@@ -44,6 +60,18 @@ export const CommentApi = DocumentApi.injectEndpoints({
         }),
         getCommentsByDocumentId: builder.query<CommentModel[], { documentId: string, page: number, pageSize: number }>({
             query: ({ documentId, page, pageSize }) => `/Comment/getByDocumentId/${documentId}?page=${page}&pageSize=${pageSize}`,
+            serializeQueryArgs: ({ endpointName, queryArgs }) => `${endpointName}-${queryArgs.documentId}`,
+            merge: (currentCache, newItems) => {
+                newItems.forEach(item => {
+                    const index = currentCache.findIndex(d => d.id === item.id);
+                    if (index === -1) {
+                        currentCache.push(item);
+                    } else {
+                        currentCache[index] = item;
+                    }
+                });
+            },
+            forceRefetch: ({ currentArg, previousArg }) => currentArg?.page !== previousArg?.page,
             providesTags: result =>
                 result
                     ? [

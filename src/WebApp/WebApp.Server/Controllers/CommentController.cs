@@ -55,7 +55,7 @@ public class CommentController : ControllerBase
 
         if (response.IsSuccessStatusCode)
         {
-            _logger.LogInformation("Comments by Document {DcoumentId} extracted successfully.", id);
+            _logger.LogInformation("Comments by Document {DocumentId} extracted successfully.", id);
 
             var documents = await response.Content.ReadFromJsonAsync<IEnumerable<CommentModel>>();
 
@@ -65,7 +65,7 @@ public class CommentController : ControllerBase
         if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")
         {
             var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
-            _logger.LogWarning("Downstream API returned problem for Document {DcoumentId}: {Title} - {Detail}", id, problem?.Title, problem?.Detail);
+            _logger.LogWarning("Downstream API returned problem for Document {DocumentId}: {Title} - {Detail}", id, problem?.Title, problem?.Detail);
 
             return StatusCode((int)response.StatusCode, problem);
         }

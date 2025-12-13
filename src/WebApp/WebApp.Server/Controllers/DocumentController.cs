@@ -47,6 +47,33 @@ public class DocumentController : ControllerBase
         return StatusCode((int)response.StatusCode);
     }
 
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(Guid id)
+    {
+        var response = await _httpClient.GetAsync($"Document/{id}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            _logger.LogInformation("Document {DcoumentId} extracted successfully.", id);
+
+            var document = await response.Content.ReadFromJsonAsync<DocumentModel>();
+
+            return Ok(document);
+        }
+
+        if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")
+        {
+            var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+            _logger.LogWarning("Downstream API returned problem for Document {DcoumentId}: {Title} - {Detail}", id, problem?.Title, problem?.Detail);
+
+            return StatusCode((int)response.StatusCode, problem);
+        }
+
+        _logger.LogError("Unexpected response from Document API for Documents {DcoumentId}. Status: {StatusCode}", id, response.StatusCode);
+
+        return StatusCode((int)response.StatusCode);
+    }
+
     [HttpGet("getByName/{name}")]
     public async Task<IActionResult> GetByName(string name)
     {
@@ -56,9 +83,9 @@ public class DocumentController : ControllerBase
         {
             _logger.LogInformation("Document {DcoumentName} extracted successfully.", name);
 
-            var documents = await response.Content.ReadFromJsonAsync<IEnumerable<DocumentModel>>();
+            var document = await response.Content.ReadFromJsonAsync<DocumentModel>();
 
-            return Ok(documents);
+            return Ok(document);
         }
 
         if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")
@@ -81,7 +108,7 @@ public class DocumentController : ControllerBase
 
         if (response.IsSuccessStatusCode)
         {
-            _logger.LogInformation("Document {DcoumentId} extracted successfully.", id);
+            _logger.LogInformation("Document {DocumentId} extracted successfully.", id);
 
             var documents = await response.Content.ReadFromJsonAsync<IEnumerable<DocumentModel>>();
 
@@ -91,7 +118,7 @@ public class DocumentController : ControllerBase
         if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")
         {
             var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
-            _logger.LogWarning("Downstream API returned problem for Document {DcoumentId}: {Title} - {Detail}", id, problem?.Title, problem?.Detail);
+            _logger.LogWarning("Downstream API returned problem for Document {DocumentId}: {Title} - {Detail}", id, problem?.Title, problem?.Detail);
 
             return StatusCode((int)response.StatusCode, problem);
         }
@@ -142,7 +169,7 @@ public class DocumentController : ControllerBase
 
         if (response.IsSuccessStatusCode)
         {
-            _logger.LogInformation("Document {DcoumentId} updated successfully.", id);
+            _logger.LogInformation("Document {DocumentId} updated successfully.", id);
 
             return NoContent();
         }
@@ -150,7 +177,7 @@ public class DocumentController : ControllerBase
         if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")
         {
             var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
-            _logger.LogWarning("Downstream API returned problem for Document {DcoumentId}: {Title} - {Detail}", id, problem?.Title, problem?.Detail);
+            _logger.LogWarning("Downstream API returned problem for Document {DocumentId}: {Title} - {Detail}", id, problem?.Title, problem?.Detail);
 
             return StatusCode((int)response.StatusCode, problem);
         }
@@ -167,7 +194,7 @@ public class DocumentController : ControllerBase
 
         if (response.IsSuccessStatusCode)
         {
-            _logger.LogInformation("Document {DcoumentId} deleted successfully.", id);
+            _logger.LogInformation("Document {DocumentId} deleted successfully.", id);
 
             return NoContent();
         }
@@ -175,7 +202,7 @@ public class DocumentController : ControllerBase
         if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")
         {
             var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
-            _logger.LogWarning("Downstream API returned problem for Document {DcoumentId}: {Title} - {Detail}", id, problem?.Title, problem?.Detail);
+            _logger.LogWarning("Downstream API returned problem for Document {DocumentId}: {Title} - {Detail}", id, problem?.Title, problem?.Detail);
 
             return StatusCode((int)response.StatusCode, problem);
         }

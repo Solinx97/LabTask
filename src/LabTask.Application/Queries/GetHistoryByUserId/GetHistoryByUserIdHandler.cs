@@ -9,7 +9,7 @@ internal class GetHistoryByUserIdHandler(AppDbContext db) : IRequestHandler<GetH
 {
     private readonly AppDbContext _db = db;
 
-    public async Task<IEnumerable<DocumentDto>> Handle(GetHistoryByUserIdQuery request, CancellationToken cancellationToken)
+    public async Task<IEnumerable<DocumentDto>> Handle(GetHistoryByUserIdQuery request, CancellationToken ct)
     {
         var now = DateTimeOffset.UtcNow;
 
@@ -18,7 +18,7 @@ internal class GetHistoryByUserIdHandler(AppDbContext db) : IRequestHandler<GetH
             .Select(o => new DocumentDto(o.Id, o.Name, o.Description, o.ExpireAt, o.UserId))
             .Skip(request.Page * request.PageSize)
             .Take(request.PageSize)
-            .ToListAsync();
+            .ToListAsync(ct);
 
         return documents;
     }

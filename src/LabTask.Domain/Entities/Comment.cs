@@ -30,6 +30,9 @@ public class Comment : IEntityId
     public static Comment Create(string content, Guid documentId, Guid userId)
     {
         ArgumentException.ThrowIfNullOrEmpty(content, nameof(content));
+        ArgumentNullException.ThrowIfNull(documentId, nameof(documentId));
+        ArgumentNullException.ThrowIfNull(userId, nameof(userId));
+
         ArgumentOutOfRangeException.ThrowIfGreaterThan(content.Length, CONTENT_MAX_LENGTH, nameof(content));
 
         return new Comment(content, documentId, userId);

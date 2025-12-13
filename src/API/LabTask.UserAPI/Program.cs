@@ -1,7 +1,10 @@
 using LabTask.UserAPI.Consts;
 using LabTask.UserAPI.Data;
 using LabTask.UserAPI.Entities;
+using LabTask.UserAPI.Interfaces;
 using LabTask.UserAPI.Middlewares;
+using LabTask.UserAPI.Repositories;
+using LabTask.UserAPI.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -11,6 +14,9 @@ using Serilog.Events;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddDbContext<UserContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));

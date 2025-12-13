@@ -115,6 +115,34 @@ public class UserController : ControllerBase
         return StatusCode((int)response.StatusCode);
     }
 
+    [HttpGet]
+    [ServiceFilter(typeof(RequireAccessTokenAttribute))]
+    public async Task<IActionResult> GetAll()
+    {
+        var response = await _httpClient.GetAsync("User");
+
+        if (response.IsSuccessStatusCode)
+        {
+            _logger.LogInformation("Users extracted successfully.");
+
+            var users = await response.Content.ReadFromJsonAsync<IEnumerable<UserModel>>();
+
+            return Ok(users);
+        }
+
+        if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")
+        {
+            var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+            _logger.LogWarning("Downstream API returned problem for Users: {Title} - {Detail}", problem?.Title, problem?.Detail);
+
+            return StatusCode((int)response.StatusCode, problem);
+        }
+
+        _logger.LogError("Unexpected response from Comment API for Users. Status: {StatusCode}", response.StatusCode);
+
+        return StatusCode((int)response.StatusCode);
+    }
+
     [HttpGet("refresh")]
     [ServiceFilter(typeof(RequireAccessTokenAttribute))]
     public async Task<IActionResult> Refresh()
