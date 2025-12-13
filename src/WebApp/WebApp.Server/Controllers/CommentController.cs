@@ -31,7 +31,10 @@ public class CommentController : ControllerBase
         if (response.IsSuccessStatusCode)
         {
             _logger.LogInformation("Comment {CommentId} created successfully for UserId: {UserId}", item.Id, item.UserId);
-            return Ok();
+
+            var comment = await response.Content.ReadFromJsonAsync<CommentModel>();
+
+            return Ok(comment);
         }
 
         if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")

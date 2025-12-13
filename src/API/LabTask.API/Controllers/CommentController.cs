@@ -19,9 +19,9 @@ public class CommentController(IMediator mediator) : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(CreateCommentCommand command)
     {
-        await _mediator.Send(command);
+        var comment = await _mediator.Send(command);
 
-        return Ok();
+        return Ok(comment);
     }
 
     [HttpGet("getByDocumentId/{id}")]

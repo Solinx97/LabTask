@@ -1,14 +1,20 @@
 import { useCreateDocumentMutation } from '@/features/document/api/Document.api';
-import { useRef, useState } from 'react';
+import { useRef, type SetStateAction } from 'react';
 import type { DocumentModel } from '../types/DocumentModel';
 
-const Create:React.FC<{ t: (key: string) => string, userId: string, getTime: (dateAsString?: string) => string }> = ({ t, userId, getTime }) => {
+interface Props {
+    t: (key: string) => string;
+    userId: string;
+    setIsOpenCreate: (value: SetStateAction<boolean>) => void;
+    getTime: (dateAsString?: string) => string;
+}
+
+const Create:React.FC<Props> = ({ t, userId, setIsOpenCreate, getTime }) => {
     const nameRef = useRef<HTMLInputElement | null>(null);
     const descriptiondRef = useRef<HTMLTextAreaElement | null>(null);
     const expiresAtRef = useRef<HTMLInputElement | null>(null);
 
     const [createDocument] = useCreateDocumentMutation();
-    const [created, setCreated] = useState(false);
 
     const createAsync = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -28,17 +34,15 @@ const Create:React.FC<{ t: (key: string) => string, userId: string, getTime: (da
 
             await createDocument(document).unwrap();
 
-            nameRef.current.value = "";
-            descriptiondRef.current.value = "";
-            setCreated(true);
+            setIsOpenCreate(false);
         } catch (e) {
             console.log(e);
         }
     }
 
     return (
-        <div className="create-document">
-            <div className="title">{t("Create")}</div>
+        <div className="create-document modal-window">
+            <div className="title">{t("CreateDocument")}</div>
             <form className="create-document__action" onSubmit={createAsync}>
                 <div className="mb-3">
                     <label htmlFor="name">{t("Name")}</label>
@@ -54,11 +58,9 @@ const Create:React.FC<{ t: (key: string) => string, userId: string, getTime: (da
                 </div>
                 <div className="actions">
                     <input type="submit" className="btn-border-shadow" value={t("Create")} />
+                    <input type="button" className="btn-border-shadow orange" value={t("Cancel")} onClick={() => setIsOpenCreate(false)} />
                 </div>
             </form>
-            {created &&
-                <div className="alert alert-success" role="alert">{t("Created")}!</div>
-            }
         </div>
     );
 }

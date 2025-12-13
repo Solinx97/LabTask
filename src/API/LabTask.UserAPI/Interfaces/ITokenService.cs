@@ -1,4 +1,4 @@
-﻿using LabTask.UserAPI.Entities;
+﻿using LabTask.UserDAL.Entities;
 
 namespace LabTask.UserAPI.Interfaces;
 

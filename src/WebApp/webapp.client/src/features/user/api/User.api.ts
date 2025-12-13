@@ -45,6 +45,10 @@ export const UserApi = createApi({
                     ]
                     : [{ type: 'User', id: 'LIST' }],
         }),
+        getUserById: builder.query<UserModel, string>({
+            query: userId => `/User/${userId}`,
+            providesTags: result => result ? [{ type: 'User', id: result.id }] : [],
+        }),
         refresh: builder.query<UserModel, void>({
             query: () => '/User/refresh',
             providesTags: result => result ? [{ type: 'User', id: result.id }] : [],
@@ -57,5 +61,6 @@ export const {
     useLoginMutation,
     useLogoutMutation,
     useUsersQuery,
+    useGetUserByIdQuery,
     useLazyRefreshQuery,
 } = UserApi;

@@ -31,7 +31,10 @@ public class DocumentController : ControllerBase
         if (response.IsSuccessStatusCode)
         {
             _logger.LogInformation("Document {DocumentId} created successfully for UserId: {UserId}", item.Id, item.UserId);
-            return Ok();
+
+            var document = await response.Content.ReadFromJsonAsync<DocumentModel>();
+
+            return Ok(document);
         }
 
         if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")
@@ -83,9 +86,9 @@ public class DocumentController : ControllerBase
         {
             _logger.LogInformation("Document {DcoumentName} extracted successfully.", name);
 
-            var document = await response.Content.ReadFromJsonAsync<DocumentModel>();
+            var documents = await response.Content.ReadFromJsonAsync<IEnumerable<DocumentModel>>();
 
-            return Ok(document);
+            return Ok(documents);
         }
 
         if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")

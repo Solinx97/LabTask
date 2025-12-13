@@ -43,19 +43,17 @@ const Document: React.FC<Props> = ({
 
     const commentsHandle = (id?: string) => {
         setSelectedDocumentId(id ?? "");
-        setIsOpenAddComment(false);
         setIsOpenComments((prev) => !prev);
     }
 
     const addCommentHandle = (id?: string) => {
         setSelectedDocumentId(id ?? "");
-        setIsOpenComments(false);
         setIsOpenAddComment((prev) => !prev);
     }
 
     const deleteAsync = async (id: string) => {
         try {
-            await deleteDocument(id).unwrap();
+            await deleteDocument({ id, userId }).unwrap();
         } catch (e) {
             console.log(e);
         }
@@ -131,6 +129,7 @@ const Document: React.FC<Props> = ({
                     t={t}
                     userId={userId}
                     documentId={document.id}
+                    setIsOpenAddComment={setIsOpenAddComment}
                 />
             }
             {(isOpenComments && selectedDocumentId === document.id) &&

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace LabTask.UserAPI.Entities;
+namespace LabTask.UserDAL.Entities;
 
 public class ApplicationUser : IdentityUser
 {

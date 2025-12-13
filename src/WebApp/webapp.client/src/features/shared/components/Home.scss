@@ -7,6 +7,32 @@ $gap-medium: 25px;
 $padding: 10px 20px;
 $mobile-max-width: 425px;
 
+.modal-window {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 400px;
+    gap: 15px;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 2px 2px 2px 2px gray;
+    background: #0c192c;
+    z-index: 100;
+}
+
+.actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    gap: 20px;
+}
+
+.documents.actions {
+    justify-content: flex-end;
+}
+
 .home {
     display: flex;
     justify-content: center;
@@ -19,19 +45,7 @@ $mobile-max-width: 425px;
         align-items: center;
         gap: $gap-medium;
 
-        .links-modal {
-            position: fixed;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            width: 400px;
-            gap: 15px;
-            padding: 20px;
-            border-radius: 20px;
-            box-shadow: 2px 2px 2px 2px gray;
-            background: #0c192c;
-            z-index: 100;
-
+        .link {
             &__title {
                 width: 100%;
                 text-align: center;
@@ -42,16 +56,32 @@ $mobile-max-width: 425px;
                 flex-direction: column;
                 gap: 5px;
 
-                input, select {
+                input,
+                select {
                     width: 300px;
                 }
             }
 
-            .actions {
+            .exist-links {
                 display: flex;
-                justify-content: center;
-                width: 100%;
-                gap: 20px;
+                flex-direction: column;
+                align-items: center;
+                gap: 5px;
+
+                &__item {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+
+                    svg {
+                        color: orange;
+                        cursor: pointer;
+
+                        :hover {
+                            transform: scale(1.2);
+                        }
+                    }
+                }
             }
         }
     }
@@ -73,10 +103,6 @@ $mobile-max-width: 425px;
     }
 
     .create-document {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-
         &__action {
             display: flex;
             flex-direction: column;

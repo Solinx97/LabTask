@@ -5,10 +5,14 @@
   "Description": "Description",
   "NoAnyDocuments": "No any documents",
   "NoAnyComments": "No any comments",
+  "NoAnyLinks": "No any links",
+  "Links": "Links",
   "Save": "Save",
   "Cancel": "Cancel",
   "Create": "Create",
   "Created": "Created",
+  "Comments": "Comments",
+  "Comment": "Comment",
   "Delete": "Delete",
   "Update": "Update",
   "AddComment": "Add comment",
@@ -16,5 +20,8 @@
   "MyDocuments": "My documents",
   "SearchDocument": "Search document",
   "History": "History",
-  "Manage": "Manage"
+  "CreateLink": "Create link",
+  "DocumentName": "Document name",
+  "CreateFor": "Create for",
+  "ExpiresAt": "Expires at"
 }

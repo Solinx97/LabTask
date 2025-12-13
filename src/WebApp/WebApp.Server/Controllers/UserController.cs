@@ -143,6 +143,34 @@ public class UserController : ControllerBase
         return StatusCode((int)response.StatusCode);
     }
 
+    [HttpGet("{id}")]
+    [ServiceFilter(typeof(RequireAccessTokenAttribute))]
+    public async Task<IActionResult> GetById(string id)
+    {
+        var response = await _httpClient.GetAsync($"User/{id}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            _logger.LogInformation("User {UserId} extracted successfully.", id);
+
+            var user = await response.Content.ReadFromJsonAsync<UserModel>();
+
+            return Ok(user);
+        }
+
+        if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")
+        {
+            var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+            _logger.LogWarning("Downstream API returned problem for User {UserId}: {Title} - {Detail}", id, problem?.Title, problem?.Detail);
+
+            return StatusCode((int)response.StatusCode, problem);
+        }
+
+        _logger.LogError("Unexpected response from Comment API for User {UserId}. Status: {StatusCode}", id, response.StatusCode);
+
+        return StatusCode((int)response.StatusCode);
+    }
+
     [HttpGet("refresh")]
     [ServiceFilter(typeof(RequireAccessTokenAttribute))]
     public async Task<IActionResult> Refresh()

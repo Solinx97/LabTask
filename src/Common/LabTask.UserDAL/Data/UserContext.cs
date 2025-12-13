@@ -1,7 +1,7 @@
-﻿using LabTask.UserAPI.Entities;
+﻿using LabTask.UserDAL.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace LabTask.UserAPI.Data;
+namespace LabTask.UserDAL.Data;
 
 public class UserContext: DbContext
 {

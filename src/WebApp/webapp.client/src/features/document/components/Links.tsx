@@ -1,9 +1,12 @@
 import { useUsersQuery } from '@/features/user/api/User.api';
-import { useCreateLinkMutation } from '@/features/document/api/Link.api';
+import { useCreateLinkMutation, useGetLinksByOwnerIdQuery, useDeleteLinkMutation } from '@/features/document/api/Link.api';
 import Loading from '@/features/shared/components/Loading';
-import { useRef, type SetStateAction } from 'react';
+import { useRef, useState, type SetStateAction } from 'react';
 import type { LinkModel } from '../types/LinkModel';
 import type { DocumentModel } from '../types/DocumentModel';
+import User from '@/features/user/components/User';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 interface Props {
     t: (key: string) => string;
@@ -14,12 +17,17 @@ interface Props {
 }
 
 const Links: React.FC<Props> = ({ t, userId, document, setIsOpenLinks, getTime }) => {
+    const pageSizeRef = useRef<number>(5);
     const userRef = useRef<HTMLSelectElement | null>(null);
     const expiresAtRef = useRef<HTMLInputElement | null>(null);
 
-    const { data: users, isLoading } = useUsersQuery();
+    const [page, setPage] = useState(0);
 
     const [createLink] = useCreateLinkMutation();
+    const [deleteLink] = useDeleteLinkMutation();
+
+    const { data: users, isLoading } = useUsersQuery();
+    const { data: ownLinks, isLoading: linkIsLoading } = useGetLinksByOwnerIdQuery({ userId, page: page, pageSize: pageSizeRef.current });
 
     const createAsync = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -41,19 +49,27 @@ const Links: React.FC<Props> = ({ t, userId, document, setIsOpenLinks, getTime }
 
             userRef.current.value = "";
 
-            setIsOpenLinks(false);
+            // setIsOpenLinks(false);
         } catch (e) {
             console.log(e);
         }
     }
 
-    if (isLoading || !users) {
+    const deleteAsync = async (id: string) => {
+        try {
+            await deleteLink({ id, userId }).unwrap();
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    if (isLoading || !users || linkIsLoading || !ownLinks) {
         return (<Loading />);
     }
 
     return (
-        <form className="links-modal" onSubmit={createAsync}>
-            <div className="links-modal__title">{t("CreateLink")}</div>
+        <form className="link modal-window" onSubmit={createAsync}>
+            <div className="link__title">{t("CreateLink")}</div>
             <div className="form-group">
                 <label htmlFor="document-name">{t("DocumentName")}:</label>
                 <div className="col-sm-10">
@@ -74,7 +90,26 @@ const Links: React.FC<Props> = ({ t, userId, document, setIsOpenLinks, getTime }
             </div>
             <div className="actions">
                 <input type="submit" className="btn-border-shadow" value={t("Create")} />
-                <input type="button" className="btn-border-shadow orange" value={t("Cancel")} onClick={() => setIsOpenLinks(false)} />
+                <input type="button" className="btn-border-shadow orange" value={t("Close")} onClick={() => setIsOpenLinks(false)} />
+            </div>
+            <div className="exist-links">
+                <div>{t("Links")}</div>
+                {ownLinks.length === 0
+                    ? <div>{t("NoAnyLinks")}</div>
+                    : <ul>{ownLinks.map(link => (
+                        <li key={link.id} className="exist-links__item">
+                            <User
+                                userId={link.toUserId}
+                            />
+                            <FontAwesomeIcon
+                                icon={faTrash}
+                                onClick={async () => await deleteAsync(link.id)}
+                            />
+                        </li>
+                    ))}
+                    </ul>
+                }
+
             </div>
         </form>
     )

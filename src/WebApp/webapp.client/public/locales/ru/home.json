@@ -5,10 +5,14 @@
   "Description": "Описание",
   "NoAnyDocuments": "Нет доступных документов",
   "NoAnyComments": "Нет доступных комментариев",
+  "NoAnyLinks": "Нет доступных ссылок",
+  "Links": "Ссылки",
   "Save": "Сохранить",
   "Cancel": "Отмена",
   "Create": "Создать",
   "Created": "Создано",
+  "Comments": "Комментарии",
+  "Comment": "Комментарий",
   "Delete": "Удалить",
   "Update": "Обновить",
   "AddComment": "Добавить комментарий",
@@ -16,5 +20,9 @@
   "MyDocuments": "Мои документы",
   "SearchDocument": "Поиск документа",
   "History": "История",
-  "Manage": "Управление"
+  "Manage": "Управление",
+  "CreateLink": "Создать ссылку",
+  "DocumentName": "Название документа",
+  "CreateFor": "Создать для",
+  "ExpiresAt": "Время истичения срока"
 }

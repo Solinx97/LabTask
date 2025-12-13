@@ -1,19 +1,22 @@
 import type { CommentModel } from "../types/CommentModel";
 import { useCreateCommentMutation } from '@/features/document/api/Comment.api';
-import { useRef } from 'react';
+import { useRef, type SetStateAction } from 'react';
 
 interface AddCommentProps {
     t: (key: string) => string;
     userId: string;
     documentId: string;
+    setIsOpenAddComment: (value: SetStateAction<boolean>) => void;
 }
 
-const AddComment:React.FC<AddCommentProps> = ({ t, userId, documentId }) => {
+const AddComment:React.FC<AddCommentProps> = ({ t, userId, documentId, setIsOpenAddComment }) => {
     const contentRef = useRef<HTMLTextAreaElement | null>(null);
 
     const [createComment] = useCreateCommentMutation();
 
-    const createAsync = async () => {
+    const createAsync = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
         try {
             const comment: CommentModel = {
                 id: crypto.randomUUID(),
@@ -23,6 +26,8 @@ const AddComment:React.FC<AddCommentProps> = ({ t, userId, documentId }) => {
             };
                 
             await createComment(comment).unwrap();
+
+            setIsOpenAddComment(false);
         } catch (e) {
             console.log(e);
         }

@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using LabTask.Domain.Aggregates;
+using MediatR;
 
 namespace LabTask.Application.Commands.CreateLink;
 
@@ -7,4 +8,4 @@ public record CreateLinkCommand(
     Guid OwnerId,
     Guid ToUserId,
     DateTimeOffset ExpireAt
-    ) : IRequest<Guid>;
+    ) : IRequest<Link>;

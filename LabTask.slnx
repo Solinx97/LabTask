@@ -1,12 +1,16 @@
 <Solution>
-  <Folder Name="/src/">
-    <Project Path="src/LabTask.Application/LabTask.Application.csproj" Id="a01339fe-a3ec-4db4-b698-d6d4f9bb7278" />
-    <Project Path="src/LabTask.Domain/LabTask.Domain.csproj" Id="4c67ad37-37a9-47b5-8e7b-872c6c2192e0" />
-    <Project Path="src/LabTask.Infrastructure/LabTask.Infrastructure.csproj" Id="f75cae3a-a4d9-4960-9c99-541ccc794554" />
-  </Folder>
+  <Folder Name="/src/" />
   <Folder Name="/src/API/">
     <Project Path="src/API/LabTask.API/LabTask.API.csproj" />
     <Project Path="src/API/LabTask.UserAPI/LabTask.UserAPI.csproj" Id="1168024b-4134-4b61-98e5-672f8b96f126" />
+  </Folder>
+  <Folder Name="/src/Common/">
+    <Project Path="src/Common/LabTask.UserDAL/LabTask.UserDAL.csproj" Id="96c40f50-eff1-4aa4-9483-3d0be5a5a626" />
+  </Folder>
+  <Folder Name="/src/Document/">
+    <Project Path="src/LabTask.Application/LabTask.Application.csproj" Id="a01339fe-a3ec-4db4-b698-d6d4f9bb7278" />
+    <Project Path="src/LabTask.Domain/LabTask.Domain.csproj" Id="4c67ad37-37a9-47b5-8e7b-872c6c2192e0" />
+    <Project Path="src/LabTask.Infrastructure/LabTask.Infrastructure.csproj" Id="f75cae3a-a4d9-4960-9c99-541ccc794554" />
   </Folder>
   <Folder Name="/src/Web/">
     <Project Path="src/WebApp/webapp.client/webapp.client.esproj">
@@ -15,4 +19,5 @@
     </Project>
     <Project Path="src/WebApp/WebApp.Server/WebApp.Server.csproj" Id="cf62fabd-a233-4706-a2eb-5b4af666a5a4" />
   </Folder>
+  <Folder Name="/tests/" />
 </Solution>

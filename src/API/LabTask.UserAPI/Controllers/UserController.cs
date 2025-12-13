@@ -1,23 +1,21 @@
-﻿using LabTask.UserAPI.Consts;
-using LabTask.UserAPI.DTOs;
-using LabTask.UserAPI.Entities;
+﻿using LabTask.UserAPI.DTOs;
 using LabTask.UserAPI.Interfaces;
+using LabTask.UserDAL.Entities;
+using LabTask.UserDAL.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 
 namespace LabTask.UserAPI.Controllers;
 
 [Route("api/v1/[controller]")]
 [ApiController]
-public class UserController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IOptions<Authentication> options,
-    IUserRepository userRepository, ITokenService tokenService) : ControllerBase
+public class UserController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IUserRepository userRepository, 
+    ITokenService tokenService) : ControllerBase
 {
     private readonly UserManager<ApplicationUser> _userManager = userManager;
     private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
-    private readonly Authentication authentication = options.Value;
     private readonly IUserRepository _userRepository = userRepository;
     private readonly ITokenService _tokenService = tokenService;
 
@@ -67,6 +65,15 @@ public class UserController(UserManager<ApplicationUser> userManager, SignInMana
         var users = await _userRepository.GetAllAsync();
 
         return Ok(users);
+    }
+
+    [HttpGet("{id}")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<IActionResult> GetById(string id)
+    {
+        var user = await _userRepository.GetByIdAsync(id);
+
+        return Ok(user);
     }
 
     [HttpGet("refresh")]

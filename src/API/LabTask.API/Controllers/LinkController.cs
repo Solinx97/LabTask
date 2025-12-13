@@ -1,5 +1,6 @@
 ﻿using LabTask.Application.Commands.CreateLink;
 using LabTask.Application.Commands.DeleteLink;
+using LabTask.Application.Queries.GetLinksByOwnerId;
 using LabTask.Application.Queries.GetLinksByUserId;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -17,9 +18,9 @@ public class LinkController(IMediator mediator) : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(CreateLinkCommand command)
     {
-        await _mediator.Send(command);
+        var link = await _mediator.Send(command);
 
-        return Ok();
+        return Ok(link);
     }
 
     [HttpGet("getByUserId/{id}")]
@@ -30,10 +31,18 @@ public class LinkController(IMediator mediator) : ControllerBase
         return Ok(links);
     }
 
-    [HttpDelete("documents/{documentId}/links/{linkId}")]
-    public async Task<IActionResult> Delete(Guid documentId, Guid linkId)
+    [HttpGet("getByOwnerId/{id}")]
+    public async Task<IActionResult> GetByOwnerId(Guid id, int page, int pageSize)
     {
-        await _mediator.Send(new DeleteLinkCommand(linkId, documentId));
+        var links = await _mediator.Send(new GetLinksByOwnerIdQuery(id, page, pageSize));
+
+        return Ok(links);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        await _mediator.Send(new DeleteLinkCommand(id));
 
         return NoContent();
     }

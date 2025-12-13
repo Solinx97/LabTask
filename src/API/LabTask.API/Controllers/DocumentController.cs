@@ -22,9 +22,9 @@ public class DocumentController(IMediator mediator) : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(CreateDocumentCommand command)
     {
-        await _mediator.Send(command);
+        var document = await _mediator.Send(command);
 
-        return Ok();
+        return Ok(document);
     }
 
     [HttpGet("{id}")]
@@ -38,9 +38,9 @@ public class DocumentController(IMediator mediator) : ControllerBase
     [HttpGet("getByName/{name}")]
     public async Task<IActionResult> GetByName(string name)
     {
-        var document = await _mediator.Send(new GetDocumentByNameQuery(name));
+        var documents = await _mediator.Send(new GetDocumentByNameQuery(name));
 
-        return Ok(document);
+        return Ok(documents);
     }
 
     [HttpGet("getActualByUserId/{id}")]

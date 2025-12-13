@@ -14,15 +14,65 @@ export const DocumentApi = createApi({
         baseUrl: apiURL
     }),
     endpoints: builder => ({
-        createDocument: builder.mutation<void, DocumentModel>({
+        createDocument: builder.mutation<DocumentModel, DocumentModel>({
             query: document => ({
                 body: document,
                 url: '/Document',
                 method: 'POST'
             }),
-            invalidatesTags: (result, error, { id }) => [
-                { type: "Document", id },
-            ]
+            async onQueryStarted(document, { dispatch, queryFulfilled }) {
+                const patches = [
+                    dispatch(
+                        DocumentApi.util.updateQueryData(
+                            'getActualDocumentsByUserId',
+                            { userId: document.userId },
+                            draft => {
+                                draft.unshift(document);
+                            }
+                        )
+                    ),
+                    dispatch(
+                        DocumentApi.util.updateQueryData(
+                            'getHistoryDocumentsByUserId',
+                            { userId: document.userId },
+                            draft => {
+                                draft.unshift(document);
+                            }
+                        )
+                    ),
+                ];
+
+                try {
+                    const { data: created } = await queryFulfilled;
+
+                    dispatch(
+                        DocumentApi.util.updateQueryData(
+                            'getActualDocumentsByUserId',
+                            { userId: created.userId },
+                            draft => {
+                                const index = draft.findIndex(l => l.id === document.id);
+                                if (index !== -1) {
+                                    draft[index] = created;
+                                }
+                            }
+                        )
+                    );
+                    dispatch(
+                        DocumentApi.util.updateQueryData(
+                            'getHistoryDocumentsByUserId',
+                            { userId: created.userId },
+                            draft => {
+                                const index = draft.findIndex(l => l.id === document.id);
+                                if (index !== -1) {
+                                    draft[index] = created;
+                                }
+                            }
+                        )
+                    );
+                } catch {
+                    patches.forEach(p => p.undo());
+                }
+            },
         }),
         updateDocument: builder.mutation<void, DocumentModel>({
             query: document => ({
@@ -63,12 +113,39 @@ export const DocumentApi = createApi({
                 }
             }
         }),
-        deleteDocument: builder.mutation<void, string>({
-            query: id => ({
+        deleteDocument: builder.mutation<void, { id: string; userId: string }>({
+            query: ({ id }) => ({
                 url: `/Document/${id}`,
                 method: 'DELETE'
             }),
-            invalidatesTags: (_result, _error, id) => [{ type: 'Document', id }],
+            async onQueryStarted({ id, userId }, { dispatch, queryFulfilled }) {
+                const patches = [
+                    dispatch(
+                        DocumentApi.util.updateQueryData(
+                            'getActualDocumentsByUserId',
+                            { userId },
+                            draft => {
+                                const index = draft.findIndex(d => d.id === id);
+                                if (index !== -1) {
+                                    draft.splice(index, 1);
+                                }
+                            }
+                        )
+                    ),
+                    dispatch(
+                        DocumentApi.util.updateQueryData(
+                            'getDocumentById',
+                            id,
+                            () => undefined
+                        )
+                    ),
+                ];
+                try {
+                    await queryFulfilled;
+                } catch {
+                    patches.forEach(p => p.undo());
+                }
+            }
         }),
         getAllDocuments: builder.query<DocumentModel[], void>({
             query: () => "/Document",
@@ -84,9 +161,15 @@ export const DocumentApi = createApi({
             query: id => `/Document/${id}`,
             providesTags: result => result ? [{ type: 'Document', id: result.id }] : [],
         }),
-        getDocumentByName: builder.query<DocumentModel, string>({
+        getDocumentByName: builder.query<DocumentModel[], string>({
             query: name => `/Document/getByName/${name}`,
-            providesTags: result => result ? [{ type: 'Document', id: result.id }] : [],
+            providesTags: result =>
+                result
+                    ? [
+                        ...result.map(document => ({ type: 'Document' as const, id: document.id })),
+                        { type: 'Document', id: 'LIST' },
+                    ]
+                    : [{ type: 'Document', id: 'LIST' }],
         }),
         getActualDocumentsByUserId: builder.query<DocumentModel[], { userId: string, page: number, pageSize: number }>({
             query: ({ userId, page, pageSize }) => `/Document/getActualByUserId/${userId}?page=${page}&pageSize=${pageSize}`,

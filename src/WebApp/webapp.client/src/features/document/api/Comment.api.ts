@@ -3,15 +3,44 @@ import { DocumentApi } from './Document.api';
 
 export const CommentApi = DocumentApi.injectEndpoints({
     endpoints: builder => ({
-        createComment: builder.mutation<void, CommentModel>({
+        createComment: builder.mutation<CommentModel, CommentModel>({
             query: comment => ({
                 body: comment,
                 url: '/Comment',
                 method: 'POST'
             }),
-            invalidatesTags: (result, error, { id }) => [
-                { type: "Comment", id },
-            ]
+            async onQueryStarted(comment, { dispatch, queryFulfilled }) {
+                const patches = [
+                    dispatch(
+                        CommentApi.util.updateQueryData(
+                            'getCommentsByDocumentId',
+                            { documentId: comment.documentId },
+                            draft => {
+                                draft.unshift(comment);
+                            }
+                        )
+                    ),
+                ];
+
+                try {
+                    const { data: created } = await queryFulfilled;
+
+                    dispatch(
+                        CommentApi.util.updateQueryData(
+                            'getCommentsByDocumentId',
+                            { documentId: created.documentId },
+                            draft => {
+                                const index = draft.findIndex(l => l.id === comment.id);
+                                if (index !== -1) {
+                                    draft[index] = created;
+                                }
+                            }
+                        )
+                    );
+                } catch {
+                    patches.forEach(p => p.undo());
+                }
+            },
         }),
         updateComment: builder.mutation<void, CommentModel>({
             query: comment => ({
@@ -44,9 +73,27 @@ export const CommentApi = DocumentApi.injectEndpoints({
                 url: `/Comment/documents/${documentId}/comments/${commentId}`,
                 method: 'DELETE'
             }),
-            invalidatesTags: (result, error, { commentId }) => [
-                { type: "Comment", commentId },
-            ]
+            async onQueryStarted({ documentId, commentId }, { dispatch, queryFulfilled }) {
+                const patches = [
+                    dispatch(
+                        CommentApi.util.updateQueryData(
+                            'getCommentsByDocumentId',
+                            { documentId },
+                            draft => {
+                                const index = draft.findIndex(d => d.id === commentId);
+                                if (index !== -1) {
+                                    draft.splice(index, 1);
+                                }
+                            }
+                        )
+                    ),
+                ];
+                try {
+                    await queryFulfilled;
+                } catch {
+                    patches.forEach(p => p.undo());
+                }
+            }
         }),
         getAllComments: builder.query<CommentModel[], void>({
             query: () => "/Comment",

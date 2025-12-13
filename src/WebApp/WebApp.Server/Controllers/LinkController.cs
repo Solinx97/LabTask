@@ -32,7 +32,9 @@ public class LinkController : ControllerBase
         {
             _logger.LogInformation("Link {LinkId} created successfully for UserId: {ToUserId}", item.Id, item.ToUserId);
 
-            return Ok();
+            var link = await response.Content.ReadFromJsonAsync<LinkModel>();
+
+            return Ok(link);
         }
 
         if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")
@@ -76,14 +78,41 @@ public class LinkController : ControllerBase
         return StatusCode((int)response.StatusCode);
     }
 
-    [HttpDelete("documents/{documentId}/links/{linkId}")]
-    public async Task<IActionResult> Delete(Guid documentId, Guid linkId)
+    [HttpGet("getByOwnerId/{id}")]
+    public async Task<IActionResult> GetByOwnerId(Guid id, [FromQuery] int page, [FromQuery] int pageSize)
     {
-        var response = await _httpClient.DeletAsync($"Link/documents/{documentId}/links/{linkId}");
+        var response = await _httpClient.GetAsync($"Link/getByOwnerId/{id}?page={page}&pageSize={pageSize}");
 
         if (response.IsSuccessStatusCode)
         {
-            _logger.LogInformation("Link {LinkId} deleted successfully.", linkId);
+            _logger.LogInformation("Link by Document {DocumentId} extracted successfully.", id);
+
+            var links = await response.Content.ReadFromJsonAsync<IEnumerable<LinkModel>>();
+
+            return Ok(links);
+        }
+
+        if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")
+        {
+            var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+            _logger.LogWarning("Downstream API returned problem for Document {DocumentId}: {Title} - {Detail}", id, problem?.Title, problem?.Detail);
+
+            return StatusCode((int)response.StatusCode, problem);
+        }
+
+        _logger.LogError("Unexpected response from Comment API for Document {DocumentId}. Status: {StatusCode}", id, response.StatusCode);
+
+        return StatusCode((int)response.StatusCode);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var response = await _httpClient.DeletAsync($"Link/{id}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            _logger.LogInformation("Link {LinkId} deleted successfully.", id);
 
             return NoContent();
         }
@@ -91,12 +120,12 @@ public class LinkController : ControllerBase
         if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")
         {
             var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
-            _logger.LogWarning("Downstream API returned problem for Link {LinkId}: {Title} - {Detail}", linkId, problem?.Title, problem?.Detail);
+            _logger.LogWarning("Downstream API returned problem for Link {LinkId}: {Title} - {Detail}", id, problem?.Title, problem?.Detail);
 
             return StatusCode((int)response.StatusCode, problem);
         }
 
-        _logger.LogError("Unexpected response from Comment API for Link {LinkId}. Status: {StatusCode}", linkId, response.StatusCode);
+        _logger.LogError("Unexpected response from Comment API for Link {LinkId}. Status: {StatusCode}", id, response.StatusCode);
 
         return StatusCode((int)response.StatusCode);
     }

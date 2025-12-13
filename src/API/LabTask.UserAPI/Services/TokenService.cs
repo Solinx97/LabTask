@@ -1,6 +1,6 @@
 ﻿using LabTask.UserAPI.Consts;
-using LabTask.UserAPI.Entities;
 using LabTask.UserAPI.Interfaces;
+using LabTask.UserDAL.Entities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
