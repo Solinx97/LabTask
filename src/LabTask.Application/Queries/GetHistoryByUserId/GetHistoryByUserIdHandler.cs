@@ -16,6 +16,8 @@ internal class GetHistoryByUserIdHandler(AppDbContext db) : IRequestHandler<GetH
         var documents = await _db.Document
             .Where(o => o.UserId == request.UserId && o.ExpireAt < now)
             .Select(o => new DocumentDto(o.Id, o.Name, o.Description, o.ExpireAt, o.UserId))
+            .Skip(request.Page * request.PageSize)
+            .Take(request.PageSize)
             .ToListAsync();
 
         return documents;

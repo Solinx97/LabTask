@@ -4,7 +4,14 @@ import type { DocumentModel } from '../types/DocumentModel';
 import AddComment from './AddComment';
 import Comments from './Comments';
 
-const Document: React.FC<{ t: (key: string) => string, userId: string, document: DocumentModel }> = ({ t, userId, document }) => {
+interface Props {
+    t: (key: string) => string;
+    userId: string;
+    document: DocumentModel;
+    getTime: (dateAsString: string) => string;
+}
+
+const Document: React.FC<Props> = ({ t, userId, document, getTime }) => {
     const [deleteDocument] = useDeleteDocumentMutation();
     const [updateDocument] = useUpdateDocumentMutation();
 
@@ -57,20 +64,6 @@ const Document: React.FC<{ t: (key: string) => string, userId: string, document:
         } catch (e) {
             console.log(e);
         }
-    }
-
-    const getTime = (dateAsString: string) => {
-        const date = new Date(dateAsString);
-
-        const internationalMonth = date.getMonth() + 1;
-        const month = internationalMonth < 10 ? `0${internationalMonth}` : internationalMonth;
-        const day = date.getDay() < 10 ? `0${date.getDay()}` : date.getDay();
-        const hours = date.getHours() < 10 ? `0${date.getHours()}` : date.getHours();
-        const minutes = date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes();
-
-        const currentDate = `${date.getFullYear()}-${month}-${day} ${hours}:${minutes}:00`;
-
-        return currentDate;
     }
 
     return (

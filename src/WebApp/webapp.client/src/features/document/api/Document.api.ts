@@ -64,8 +64,8 @@ export const DocumentApi = createApi({
                     ]
                     : [{ type: 'Document', id: 'LIST' }],
         }),
-        getHistoryDocumentsByUserId: builder.query<DocumentModel[], string>({
-            query: userId => `/Document/getHustoryByUserId/${userId}`,
+        getHistoryDocumentsByUserId: builder.query<DocumentModel[], { userId: string, page: number, pageSize: number }>({
+            query: ({ userId, page, pageSize }) => `/Document/getHustoryByUserId/${userId}?page=${page}&pageSize=${pageSize}`,
             providesTags: result =>
                 result
                     ? [

@@ -1,5 +1,5 @@
 import { useCreateDocumentMutation } from '@/features/document/api/Document.api';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import type { DocumentModel } from '../types/DocumentModel';
 
 const Create:React.FC<{ t: (key: string) => string, userId: string }> = ({ t, userId }) => {
@@ -8,9 +8,16 @@ const Create:React.FC<{ t: (key: string) => string, userId: string }> = ({ t, us
     const expiresAtRef = useRef<HTMLInputElement | null>(null);
 
     const [createDocument] = useCreateDocumentMutation();
+    const [created, setCreated] = useState(false);
 
-    const createAsync = async () => {
+    const createAsync = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
         try {
+            if (!nameRef.current || !descriptiondRef.current) {
+                return;
+            }
+
             const document: DocumentModel = {
                 id: crypto.randomUUID(),
                 name: nameRef.current ? nameRef.current.value : "",
@@ -20,6 +27,10 @@ const Create:React.FC<{ t: (key: string) => string, userId: string }> = ({ t, us
             };
 
             await createDocument(document).unwrap();
+
+            nameRef.current.value = "";
+            descriptiondRef.current.value = "";
+            setCreated(true);
         } catch (e) {
             console.log(e);
         }
@@ -45,7 +56,7 @@ const Create:React.FC<{ t: (key: string) => string, userId: string }> = ({ t, us
             <form className="create-document__action" onSubmit={createAsync}>
                 <div className="mb-3">
                     <label htmlFor="name">{t("Name")}</label>
-                    <input className="form-control" type="text" name="name" placeholder={t("Name")} ref={nameRef} required />
+                    <input className="form-control" type="text" name="name" ref={nameRef} required />
                 </div>
                 <div className="mb-3">
                     <label htmlFor="description">{t("Description")}</label>
@@ -53,12 +64,15 @@ const Create:React.FC<{ t: (key: string) => string, userId: string }> = ({ t, us
                 </div>
                 <div className="mb-3">
                     <label htmlFor="expires">{t("ExpiresAt")}</label>
-                    <input className="form-control" type="datetime-local" defaultValue={getCurrentTime()} min={getCurrentTime()} name="expires" ref={expiresAtRef} required />
+                    <input className="form-control" type="datetime-local" defaultValue={getCurrentTime()} name="expires" ref={expiresAtRef} required />
                 </div>
                 <div className="actions">
                     <input type="submit" className="btn-border-shadow" value={t("Create")} />
                 </div>
             </form>
+            {created &&
+                <div className="alert alert-success" role="alert">{t("Created")}!</div>
+            }
         </div>
     );
 }

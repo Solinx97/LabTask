@@ -84,7 +84,7 @@ const Comments: React.FC<{ t: (key: string) => string, documentId: string, actio
                             </div>
                             :
                             <div className="container">
-                                <div>{t("Content")}: {comment.content}</div>
+                                <div>{comment.content}</div>
                                 {actionsAllow &&
                                     <div className="actions">
                                         <button className="btn-border-shadow" onClick={async () => await deleteAsync(comment.id)}>{t("Delete")}</button>

@@ -38,8 +38,9 @@ public class Document : IEntityId
         ArgumentException.ThrowIfNullOrEmpty(name, nameof(name));
         ArgumentOutOfRangeException.ThrowIfGreaterThan(name.Length, NAME_MAX_LENGTH, nameof(name));
         ArgumentNullException.ThrowIfNull(description, nameof(description));
-        ArgumentOutOfRangeException.ThrowIfLessThan(expireAt, DateTimeOffset.UtcNow, nameof(expireAt));
         ArgumentNullException.ThrowIfNull(userId, nameof(userId));
+
+        DocumentExpireAtExcepction.ThrowIfPastTime(expireAt);
 
         return new Document(name, description, expireAt, userId);
     }

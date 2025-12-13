@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using System.Net;
 using WebApp.Server.Attributes;
 using WebApp.Server.Consts;
 using WebApp.Server.Enums;
@@ -30,36 +29,38 @@ public class UserController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegistrationModel item)
     {
-        try
+        var response = await _httpClient.PostAsync("User/register", JsonContent.Create(item));
+
+        if (response.IsSuccessStatusCode)
         {
-            var responseMessage = await _httpClient.PostAsync("User/register", JsonContent.Create(item));
-            responseMessage.EnsureSuccessStatusCode();
+            _logger.LogInformation("User registry successfully.");
 
             return Ok();
         }
-        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
-        {
-            _logger.LogError(ex, "Some issues during Registry a new user. Please, check your data and try one more time.");
 
-            return BadRequest();
-        }
-        catch (HttpRequestException ex)
+        if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")
         {
-            _logger.LogError(ex, "Some issues during Registry a new user. Please, try one more time late.");
+            var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+            _logger.LogWarning("Downstream API returned problem during Registration: {Title} - {Detail}", problem?.Title, problem?.Detail);
 
-            return StatusCode((int)(ex.StatusCode ?? HttpStatusCode.InternalServerError), ex.Message);
+            return StatusCode((int)response.StatusCode, problem);
         }
+
+        _logger.LogError("Unexpected response from Comment API during Registration. Status: {StatusCode}", response.StatusCode);
+
+        return StatusCode((int)response.StatusCode);
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginModel item)
     {
-        try
-        {
-            var responseMessage = await _httpClient.PostAsync("User/login", JsonContent.Create(item));
-            responseMessage.EnsureSuccessStatusCode();
+        var response = await _httpClient.PostAsync("User/login", JsonContent.Create(item));
 
-            var loginResponse = await responseMessage.Content.ReadFromJsonAsync<LoginResponseModel>();
+        if (response.IsSuccessStatusCode)
+        {
+            _logger.LogInformation("User login successfully.");
+
+            var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponseModel>();
 
             HttpContext.Response.Cookies.Append(nameof(AuthenticationCookie.AccessToken), loginResponse.Token, new CookieOptions
             {
@@ -72,71 +73,73 @@ public class UserController : ControllerBase
 
             return Ok(loginResponse.User);
         }
-        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
-        {
-            _logger.LogError(ex, "Some issues during Login. Please, check your data and try one more time.");
 
-            return BadRequest();
-        }
-        catch (HttpRequestException ex)
+        if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")
         {
-            _logger.LogError(ex, "Some issues during Login. Please, try one more time late.");
+            var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+            _logger.LogWarning("Downstream API returned problem during Login: {Title} - {Detail}", problem?.Title, problem?.Detail);
 
-            return StatusCode((int)(ex.StatusCode ?? HttpStatusCode.InternalServerError), ex.Message);
+            return StatusCode((int)response.StatusCode, problem);
         }
+
+        _logger.LogError("Unexpected response from Comment API during Login. Status: {StatusCode}", response.StatusCode);
+
+        return StatusCode((int)response.StatusCode);
     }
 
     [HttpPost("logout")]
     [ServiceFilter(typeof(RequireAccessTokenAttribute))]
     public async Task<IActionResult> Logout()
     {
-        try
+        var response = await _httpClient.PostAsync("User/logout", null);
+
+        if (response.IsSuccessStatusCode)
         {
-            var responseMessage = await _httpClient.PostAsync("User/logout", null);
-            responseMessage.EnsureSuccessStatusCode();
+            _logger.LogInformation("User logout successfully.");
 
             HttpContext.Response.Cookies.Delete(nameof(AuthenticationCookie.AccessToken));
 
             return Ok();
         }
-        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
-        {
-            _logger.LogError(ex, "Some issues during Logout. Please, check your data and try one more time.");
 
-            return BadRequest();
-        }
-        catch (HttpRequestException ex)
+        if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")
         {
-            _logger.LogError(ex, "Some issues during Logout. Please, try one more time late.");
+            var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+            _logger.LogWarning("Downstream API returned problem during Logout: {Title} - {Detail}", problem?.Title, problem?.Detail);
 
-            return StatusCode((int)(ex.StatusCode ?? HttpStatusCode.InternalServerError), ex.Message);
+            return StatusCode((int)response.StatusCode, problem);
         }
+
+        _logger.LogError("Unexpected response from Comment API during Logout. Status: {StatusCode}", response.StatusCode);
+
+        return StatusCode((int)response.StatusCode);
     }
 
     [HttpGet("refresh")]
     [ServiceFilter(typeof(RequireAccessTokenAttribute))]
     public async Task<IActionResult> Refresh()
     {
-        try
-        {
-            var responseMessage = await _httpClient.GetAsync("User/refresh");
-            responseMessage.EnsureSuccessStatusCode();
+        var response = await _httpClient.GetAsync("User/refresh");
 
-            var user = await responseMessage.Content.ReadFromJsonAsync<UserModel>();
+        if (response.IsSuccessStatusCode)
+        {
+            _logger.LogInformation("User refresh successfully.");
+
+            var user = await response.Content.ReadFromJsonAsync<UserModel>();
 
             return Ok(user);
         }
-        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
-        {
-            _logger.LogError(ex, "Some issues during Logout. Please, check your data and try one more time.");
 
-            return BadRequest();
-        }
-        catch (HttpRequestException ex)
+        if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")
         {
-            _logger.LogError(ex, "Some issues during Logout. Please, try one more time late.");
+            var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+            _logger.LogWarning("Downstream API returned problem during Refresh: {Title} - {Detail}", problem?.Title, problem?.Detail);
 
-            return StatusCode((int)(ex.StatusCode ?? HttpStatusCode.InternalServerError), ex.Message);
+            return StatusCode((int)response.StatusCode, problem);
         }
+
+        _logger.LogError("Unexpected response from Comment API during Refresh. Status: {StatusCode}", response.StatusCode);
+
+        return StatusCode((int)response.StatusCode);
     }
 }

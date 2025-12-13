@@ -1,24 +1,18 @@
-import { useLoginMutation } from '@/features/user/api/User.api';
-import { updateUser } from '@/features/user/store/UserSlice';
 import { useRef } from 'react';
-import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import type { LoginModel } from '../types/LoginModel';
 import { useTranslation } from 'react-i18next';
 
 import './User.scss';
+import { useAuth } from '../hooks/useAuth';
 
 const Login = () => {
     const { t } = useTranslation('account');
 
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-
     const emailRef = useRef<HTMLInputElement | null>(null);
     const passwordRef = useRef<HTMLInputElement | null>(null);
 
-    const [login] = useLoginMutation();
-
+    const auth = useAuth();
+    
     const loginAsync = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -28,10 +22,7 @@ const Login = () => {
                 password: passwordRef.current ? passwordRef.current.value : ""
             };
 
-            const user = await login(userLogin).unwrap();
-            dispatch(updateUser(user));
-
-            navigate("/");
+            auth?.loginAsync(userLogin);
         } catch (e) {
             console.log(e);
         }

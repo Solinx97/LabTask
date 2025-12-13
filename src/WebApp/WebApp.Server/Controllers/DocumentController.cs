@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using System.Net;
 using WebApp.Server.Attributes;
 using WebApp.Server.Consts;
 using WebApp.Server.Interfaces;
@@ -27,181 +26,162 @@ public class DocumentController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] DocumentModel item)
     {
-        try
-        {
-            var responseMessage = await _httpClient.PostAsync("Document", JsonContent.Create(item));
-            responseMessage.EnsureSuccessStatusCode();
+        var response = await _httpClient.PostAsync("Document", JsonContent.Create(item));
 
+        if (response.IsSuccessStatusCode)
+        {
+            _logger.LogInformation("Document {DocumentId} created successfully for UserId: {UserId}", item.Id, item.UserId);
             return Ok();
         }
-        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
+
+        if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")
         {
-            _logger.LogError(ex, "Some issues during create a new document. Please, check your data and try one more time.");
+            var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+            _logger.LogWarning("Downstream API returned problem for Document {DocumentId}: {Title} - {Detail}", item.Id, problem?.Title, problem?.Detail);
 
-            return BadRequest();
+            return StatusCode((int)response.StatusCode, problem);
         }
-        catch (HttpRequestException ex)
-        {
-            _logger.LogError(ex, "Some issues during create a new document. Please, try one more time late.");
 
-            return StatusCode((int)(ex.StatusCode ?? HttpStatusCode.InternalServerError), ex.Message);
-        }
-    }
+        _logger.LogError("Unexpected response from Document API for Document {DocumentId}. Status: {StatusCode}", item.Id, response.StatusCode);
 
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
-    {
-        try
-        {
-            var responseMessage = await _httpClient.GetAsync("Document");
-            responseMessage.EnsureSuccessStatusCode();
-
-            var documents = await responseMessage.Content.ReadFromJsonAsync<IEnumerable<DocumentModel>>();
-
-            return Ok(documents);
-        }
-        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
-        {
-            _logger.LogError(ex, "Some issues during get all documents. Please, check your data and try one more time.");
-
-            return BadRequest();
-        }
-        catch (HttpRequestException ex)
-        {
-            _logger.LogError(ex, "Some issues during get all documents. Please, try one more time late.");
-
-            return StatusCode((int)(ex.StatusCode ?? HttpStatusCode.InternalServerError), ex.Message);
-        }
+        return StatusCode((int)response.StatusCode);
     }
 
     [HttpGet("getByName/{name}")]
     public async Task<IActionResult> GetByName(string name)
     {
-        try
+        var response = await _httpClient.GetAsync($"Document/getByName/{name}");
+
+        if (response.IsSuccessStatusCode)
         {
-            var responseMessage = await _httpClient.GetAsync($"Document/getByName/{name}");
-            responseMessage.EnsureSuccessStatusCode();
+            _logger.LogInformation("Document {DcoumentName} extracted successfully.", name);
 
-            var document = await responseMessage.Content.ReadFromJsonAsync<DocumentModel>();
+            var documents = await response.Content.ReadFromJsonAsync<IEnumerable<DocumentModel>>();
 
-            return Ok(document);
+            return Ok(documents);
         }
-        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
+
+        if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")
         {
-            _logger.LogError(ex, "Some issues during get document. Please, check your data and try one more time.");
+            var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+            _logger.LogWarning("Downstream API returned problem for Document {DcoumentName}: {Title} - {Detail}", name, problem?.Title, problem?.Detail);
 
-            return BadRequest();
+            return StatusCode((int)response.StatusCode, problem);
         }
-        catch (HttpRequestException ex)
-        {
-            _logger.LogError(ex, "Some issues during get document. Please, try one more time late.");
 
-            return StatusCode((int)(ex.StatusCode ?? HttpStatusCode.InternalServerError), ex.Message);
-        }
+        _logger.LogError("Unexpected response from Document API for Documents {DcoumentName}. Status: {StatusCode}", name, response.StatusCode);
+
+        return StatusCode((int)response.StatusCode);
     }
 
     [HttpGet("getActualByUserId/{id}")]
     public async Task<IActionResult> GetActualByUserId(Guid id, [FromQuery] int page, [FromQuery] int pageSize)
     {
-        try
-        {
-            var responseMessage = await _httpClient.GetAsync($"Document/getActualByUserId/{id}?page={page}&pageSize={pageSize}");
-            responseMessage.EnsureSuccessStatusCode();
+        var response = await _httpClient.GetAsync($"Document/getActualByUserId/{id}?page={page}&pageSize={pageSize}");
 
-            var documents = await responseMessage.Content.ReadFromJsonAsync<IEnumerable<DocumentModel>>();
+        if (response.IsSuccessStatusCode)
+        {
+            _logger.LogInformation("Document {DcoumentId} extracted successfully.", id);
+
+            var documents = await response.Content.ReadFromJsonAsync<IEnumerable<DocumentModel>>();
 
             return Ok(documents);
         }
-        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
-        {
-            _logger.LogError(ex, "Some issues during get documents by user ID. Please, check your data and try one more time.");
 
-            return BadRequest();
-        }
-        catch (HttpRequestException ex)
+        if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")
         {
-            _logger.LogError(ex, "Some issues during get documents by user ID. Please, try one more time late.");
+            var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+            _logger.LogWarning("Downstream API returned problem for Document {DcoumentId}: {Title} - {Detail}", id, problem?.Title, problem?.Detail);
 
-            return StatusCode((int)(ex.StatusCode ?? HttpStatusCode.InternalServerError), ex.Message);
+            return StatusCode((int)response.StatusCode, problem);
         }
+
+        _logger.LogError("Unexpected response from Document API for Document {DocumentId}. Status: {StatusCode}", id, response.StatusCode);
+
+        return StatusCode((int)response.StatusCode);
     }
 
     [HttpGet("getHustoryByUserId/{id}")]
-    public async Task<IActionResult> GetHustoryByUserId(Guid id)
+    public async Task<IActionResult> GetHustoryByUserId(Guid id, [FromQuery] int page, [FromQuery] int pageSize)
     {
-        try
-        {
-            var responseMessage = await _httpClient.GetAsync($"Document/getHustoryByUserId/{id}");
-            responseMessage.EnsureSuccessStatusCode();
+        var response = await _httpClient.GetAsync($"Document/getHustoryByUserId/{id}?page={page}&pageSize={pageSize}");
 
-            var documents = await responseMessage.Content.ReadFromJsonAsync<IEnumerable<DocumentModel>>();
+        if (response.IsSuccessStatusCode)
+        {
+            _logger.LogInformation("Document {DcoumentId} extracted successfully.", id);
+
+            var documents = await response.Content.ReadFromJsonAsync<IEnumerable<DocumentModel>>();
 
             return Ok(documents);
         }
-        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
-        {
-            _logger.LogError(ex, "Some issues during get documents by user ID. Please, check your data and try one more time.");
 
-            return BadRequest();
-        }
-        catch (HttpRequestException ex)
+        if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")
         {
-            _logger.LogError(ex, "Some issues during get documents by user ID. Please, try one more time late.");
+            var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+            _logger.LogWarning("Downstream API returned problem for Document {DcoumentId}: {Title} - {Detail}", id, problem?.Title, problem?.Detail);
 
-            return StatusCode((int)(ex.StatusCode ?? HttpStatusCode.InternalServerError), ex.Message);
+            return StatusCode((int)response.StatusCode, problem);
         }
+
+        _logger.LogError("Unexpected response from Document API for Document {DocumentId}. Status: {StatusCode}", id, response.StatusCode);
+
+        return StatusCode((int)response.StatusCode);
     }
 
     [HttpPatch("{id}")]
     public async Task<IActionResult> PartialUpdate(Guid id, [FromBody] DocumentModel item)
     {
-        try
+        if (id != item.Id)
         {
-            if (id != item.Id)
-            {
-                return BadRequest("Route ID and body ID do not match.");
-            }
+            _logger.LogWarning("Route ID and body ID do not match.");
 
-            var responseMessage = await _httpClient.PatchAsync($"Document/{id}", JsonContent.Create(item));
-            responseMessage.EnsureSuccessStatusCode();
+            return BadRequest("Route ID and body ID do not match.");
+        }
+
+        var response = await _httpClient.PatchAsync($"Document/{id}", JsonContent.Create(item));
+
+        if (response.IsSuccessStatusCode)
+        {
+            _logger.LogInformation("Document {DcoumentId} updated successfully.", id);
 
             return NoContent();
         }
-        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
-        {
-            _logger.LogError(ex, "Some issues during updating document. Please, check your data and try one more time.");
 
-            return BadRequest();
-        }
-        catch (HttpRequestException ex)
+        if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")
         {
-            _logger.LogError(ex, "Some issues during updating document. Please, try one more time late.");
+            var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+            _logger.LogWarning("Downstream API returned problem for Document {DcoumentId}: {Title} - {Detail}", id, problem?.Title, problem?.Detail);
 
-            return StatusCode((int)(ex.StatusCode ?? HttpStatusCode.InternalServerError), ex.Message);
+            return StatusCode((int)response.StatusCode, problem);
         }
+
+        _logger.LogError("Unexpected response from Document API for Document {DocumentId}. Status: {StatusCode}", id, response.StatusCode);
+
+        return StatusCode((int)response.StatusCode);
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        try
+        var response = await _httpClient.DeletAsync($"Document/{id}");
+
+        if (response.IsSuccessStatusCode)
         {
-            var responseMessage = await _httpClient.DeletAsync($"Document/{id}");
-            responseMessage.EnsureSuccessStatusCode();
+            _logger.LogInformation("Document {DcoumentId} deleted successfully.", id);
 
             return NoContent();
         }
-        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
-        {
-            _logger.LogError(ex, "Some issues during deleting document. Please, check your data and try one more time.");
 
-            return BadRequest();
-        }
-        catch (HttpRequestException ex)
+        if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")
         {
-            _logger.LogError(ex, "Some issues during deleting document. Please, try one more time late.");
+            var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+            _logger.LogWarning("Downstream API returned problem for Document {DcoumentId}: {Title} - {Detail}", id, problem?.Title, problem?.Detail);
 
-            return StatusCode((int)(ex.StatusCode ?? HttpStatusCode.InternalServerError), ex.Message);
+            return StatusCode((int)response.StatusCode, problem);
         }
+
+        _logger.LogError("Unexpected response from Document API for Document {DocumentId}. Status: {StatusCode}", id, response.StatusCode);
+
+        return StatusCode((int)response.StatusCode);
     }
 }

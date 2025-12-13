@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import InfiniteScrollTrigger from '@/events/InfiniteScrollTrigger';
 import type { DocumentModel } from '../types/DocumentModel';
 
-const Documents: React.FC<{ t: (key: string) => string, userId: string }> = ({ t, userId }) => {
+const Documents: React.FC<{ t: (key: string) => string, userId: string, getTime: (dateAsString: string) => string }> = ({ t, userId, getTime }) => {
     const pageSizeRef = useRef<number>(5);
 
     const [page, setPage] = useState(0);
@@ -40,6 +40,7 @@ const Documents: React.FC<{ t: (key: string) => string, userId: string }> = ({ t
                             t={t}
                             userId={userId}
                             document={document}
+                            getTime={getTime}
                         />
                     </li>
                 ))}

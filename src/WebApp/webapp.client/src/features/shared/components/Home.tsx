@@ -35,6 +35,20 @@ const Home: React.FC = () => {
         }
     }
 
+    const getTime = (dateAsString: string) => {
+        const date = new Date(dateAsString);
+
+        const internationalMonth = date.getMonth() + 1;
+        const month = internationalMonth < 10 ? `0${internationalMonth}` : internationalMonth;
+        const day = date.getDay() < 10 ? `0${date.getDay()}` : date.getDay();
+        const hours = date.getHours() < 10 ? `0${date.getHours()}` : date.getHours();
+        const minutes = date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes();
+
+        const currentDate = `${date.getFullYear()}-${month}-${day} ${hours}:${minutes}:00`;
+
+        return currentDate;
+    }
+
     return (
         <div className="home">
             <div className="home__item">
@@ -51,6 +65,7 @@ const Home: React.FC = () => {
                     <Documents
                         t={t}
                         userId={user?.id ?? ""}
+                        getTime={getTime}
                     />
                 }
                 {section === 2 &&
@@ -63,6 +78,7 @@ const Home: React.FC = () => {
                     <History
                         t={t}
                         userId={user?.id ?? ""}
+                        getTime={getTime}
                     />
                 }
             </div>

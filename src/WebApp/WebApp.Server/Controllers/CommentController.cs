@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using System.Net;
 using WebApp.Server.Attributes;
 using WebApp.Server.Consts;
 using WebApp.Server.Interfaces;
@@ -27,129 +26,109 @@ public class CommentController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CommentModel item)
     {
-        try
-        {
-            var responseMessage = await _httpClient.PostAsync("Comment", JsonContent.Create(item));
-            responseMessage.EnsureSuccessStatusCode();
+        var response = await _httpClient.PostAsync("Comment", JsonContent.Create(item));
 
+        if (response.IsSuccessStatusCode)
+        {
+            _logger.LogInformation("Comment {CommentId} created successfully for UserId: {UserId}", item.Id, item.UserId);
             return Ok();
         }
-        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
+
+        if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")
         {
-            _logger.LogError(ex, "Some issues during create a new comment. Please, check your data and try one more time.");
+            var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+            _logger.LogWarning("Downstream API returned problem for Comment {CommentId}: {Title} - {Detail}", item.Id, problem?.Title, problem?.Detail);
 
-            return BadRequest();
+            return StatusCode((int)response.StatusCode, problem);
         }
-        catch (HttpRequestException ex)
-        {
-            _logger.LogError(ex, "Some issues during create a new comment. Please, try one more time late.");
 
-            return StatusCode((int)(ex.StatusCode ?? HttpStatusCode.InternalServerError), ex.Message);
-        }
-    }
+        _logger.LogError("Unexpected response from Comment API for Comment {CommentId}. Status: {StatusCode}", item.Id, response.StatusCode);
 
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
-    {
-        try
-        {
-            var responseMessage = await _httpClient.GetAsync("Comment");
-            responseMessage.EnsureSuccessStatusCode();
+        return StatusCode((int)response.StatusCode);
 
-            var comments = await responseMessage.Content.ReadFromJsonAsync<IEnumerable<CommentModel>>();
-
-            return Ok(comments);
-        }
-        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
-        {
-            _logger.LogError(ex, "Some issues during get all comments. Please, check your data and try one more time.");
-
-            return BadRequest();
-        }
-        catch (HttpRequestException ex)
-        {
-            _logger.LogError(ex, "Some issues during get all comments. Please, try one more time late.");
-
-            return StatusCode((int)(ex.StatusCode ?? HttpStatusCode.InternalServerError), ex.Message);
-        }
     }
 
     [HttpGet("getByDocumentId/{id}")]
     public async Task<IActionResult> GetByDocumentId(Guid id, [FromQuery] int page, [FromQuery] int pageSize)
     {
-        try
+        var response = await _httpClient.GetAsync($"Comment/getByDocumentId/{id}?page={page}&pageSize={pageSize}");
+
+        if (response.IsSuccessStatusCode)
         {
-            var responseMessage = await _httpClient.GetAsync($"Comment/getByDocumentId/{id}?page={page}&pageSize={pageSize}");
-            responseMessage.EnsureSuccessStatusCode();
+            _logger.LogInformation("Comments by Document {DcoumentId} extracted successfully.", id);
 
-            var comments = await responseMessage.Content.ReadFromJsonAsync<IEnumerable<CommentModel>>();
+            var documents = await response.Content.ReadFromJsonAsync<IEnumerable<CommentModel>>();
 
-            return Ok(comments);
+            return Ok(documents);
         }
-        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
+
+        if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")
         {
-            _logger.LogError(ex, "Some issues during get comments by user ID. Please, check your data and try one more time.");
+            var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+            _logger.LogWarning("Downstream API returned problem for Document {DcoumentId}: {Title} - {Detail}", id, problem?.Title, problem?.Detail);
 
-            return BadRequest();
+            return StatusCode((int)response.StatusCode, problem);
         }
-        catch (HttpRequestException ex)
-        {
-            _logger.LogError(ex, "Some issues during get comments by user ID. Please, try one more time late.");
 
-            return StatusCode((int)(ex.StatusCode ?? HttpStatusCode.InternalServerError), ex.Message);
-        }
+        _logger.LogError("Unexpected response from Comment API for Document {CommentId}. Status: {StatusCode}", id, response.StatusCode);
+
+        return StatusCode((int)response.StatusCode);
     }
 
     [HttpPatch("{id}")]
     public async Task<IActionResult> PartialUpdate(Guid id, [FromBody] CommentModel item)
     {
-        try
+        if (id != item.Id)
         {
-            if (id != item.Id)
-            {
-                return BadRequest("Route ID and body ID do not match.");
-            }
+            _logger.LogWarning("Route ID and body ID do not match.");
 
-            var responseMessage = await _httpClient.PatchAsync($"Comment/{id}", JsonContent.Create(item));
-            responseMessage.EnsureSuccessStatusCode();
+            return BadRequest("Route ID and body ID do not match.");
+        }
+
+        var response = await _httpClient.PatchAsync($"Comment/{id}", JsonContent.Create(item));
+
+        if (response.IsSuccessStatusCode)
+        {
+            _logger.LogInformation("Comment {CommentId} update successfully.", id);
 
             return NoContent();
         }
-        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
-        {
-            _logger.LogError(ex, "Some issues during updating comment. Please, check your data and try one more time.");
 
-            return BadRequest();
-        }
-        catch (HttpRequestException ex)
+        if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")
         {
-            _logger.LogError(ex, "Some issues during updating comment. Please, try one more time late.");
+            var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+            _logger.LogWarning("Downstream API returned problem for Comment {CommentId}: {Title} - {Detail}", id, problem?.Title, problem?.Detail);
 
-            return StatusCode((int)(ex.StatusCode ?? HttpStatusCode.InternalServerError), ex.Message);
+            return StatusCode((int)response.StatusCode, problem);
         }
+
+        _logger.LogError("Unexpected response from Comment API for Comment {CommentId}. Status: {StatusCode}", id, response.StatusCode);
+
+        return StatusCode((int)response.StatusCode);
     }
 
     [HttpDelete("documents/{documentId}/comments/{commentId}")]
     public async Task<IActionResult> Delete(Guid documentId, Guid commentId)
     {
-        try
+        var response = await _httpClient.DeletAsync($"Comment/documents/{documentId}/comments/{commentId}");
+
+        if (response.IsSuccessStatusCode)
         {
-            var responseMessage = await _httpClient.DeletAsync($"Comment/documents/{documentId}/comments/{commentId}");
-            responseMessage.EnsureSuccessStatusCode();
+            _logger.LogInformation("Comment {CommentId} deleted successfully.", commentId);
 
             return NoContent();
         }
-        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
-        {
-            _logger.LogError(ex, "Some issues during deleting comment. Please, check your data and try one more time.");
 
-            return BadRequest();
-        }
-        catch (HttpRequestException ex)
+        if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")
         {
-            _logger.LogError(ex, "Some issues during deleting comment. Please, try one more time late.");
+            var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+            _logger.LogWarning("Downstream API returned problem for Comment {CommentId}: {Title} - {Detail}", commentId, problem?.Title, problem?.Detail);
 
-            return StatusCode((int)(ex.StatusCode ?? HttpStatusCode.InternalServerError), ex.Message);
+            return StatusCode((int)response.StatusCode, problem);
         }
+
+        _logger.LogError("Unexpected response from Comment API for Comment {CommentId}. Status: {StatusCode}", commentId, response.StatusCode);
+
+        return StatusCode((int)response.StatusCode);
     }
 }

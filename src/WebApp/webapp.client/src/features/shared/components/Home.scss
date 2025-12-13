@@ -46,6 +46,10 @@ $mobile-max-width: 425px;
             flex-direction: column;
             align-items: left;
         }
+
+        .alert-success {
+            margin: 20px 0;
+        }
     }
 
     .documents, .comments {
@@ -121,6 +125,7 @@ $mobile-max-width: 425px;
 
     .comments {
         max-height: 300px;
+        width: 300px;
         overflow-y: scroll;
 
         &__item {

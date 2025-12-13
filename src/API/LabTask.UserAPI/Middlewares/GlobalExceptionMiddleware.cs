@@ -1,4 +1,5 @@
-﻿using LabTask.UserAPI.Enums;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace LabTask.UserAPI.Middlewares;
 
@@ -13,94 +14,50 @@ public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExcep
         {
             await _next(context);
         }
-        catch (ArgumentOutOfRangeException ex)
-        {
-            var eventId = DateTime.UtcNow.Ticks.ToString();
-
-            _logger.LogError(new EventId(int.Parse(eventId[^9..])), ex,
-                ex.Message, eventId);
-
-            context.Response.StatusCode = 500;
-            context.Response.ContentType = "application/json";
-
-            var errorResponse = new
-            {
-                id = eventId,
-                type = ExceptionType.ArgumentOutOfRangeException,
-                data = new
-                {
-                    message = $"Internal server error ID = {eventId}"
-                }
-            };
-
-            await context.Response.WriteAsJsonAsync(errorResponse);
-        }
-        catch (ArgumentNullException ex)
-        {
-            var eventId = DateTime.UtcNow.Ticks.ToString();
-
-            _logger.LogError(new EventId(int.Parse(eventId[^9..])), ex,
-                ex.Message, eventId);
-
-            context.Response.StatusCode = 500;
-            context.Response.ContentType = "application/json";
-
-            var errorResponse = new
-            {
-                id = eventId,
-                type = ExceptionType.ArgumentNullException,
-                data = new
-                {
-                    message = $"Internal server error ID = {eventId}"
-                }
-            };
-
-            await context.Response.WriteAsJsonAsync(errorResponse);
-        }
-        catch (ArgumentException ex)
-        {
-            var eventId = DateTime.UtcNow.Ticks.ToString();
-
-            _logger.LogError(new EventId(int.Parse(eventId[^9..])), ex,
-                ex.Message, eventId);
-
-            context.Response.StatusCode = 500;
-            context.Response.ContentType = "application/json";
-
-            var errorResponse = new
-            {
-                id = eventId,
-                type = ExceptionType.ArgumentException,
-                data = new
-                {
-                    message = $"Internal server error ID = {eventId}"
-                }
-            };
-
-            await context.Response.WriteAsJsonAsync(errorResponse);
-        }
         catch (Exception ex)
         {
-            var eventId = DateTime.UtcNow.Ticks.ToString();
-
-            _logger.LogError(new EventId(int.Parse(eventId[^9..])), ex,
-                ex.Message, eventId);
-
-            context.Response.StatusCode = 500;
-            context.Response.ContentType = "application/json";
-
-            var errorResponse = new
-            {
-                id = eventId,
-                type = ExceptionType.Exception,
-                data = new
-                {
-                    message = $"Internal server error ID = {eventId}"
-                }
-            };
-
-            await context.Response.WriteAsJsonAsync(errorResponse);
+            await HandleExceptionAsync(context, ex);
         }
     }
+
+    private async Task HandleExceptionAsync(HttpContext context, Exception ex)
+    {
+        var eventId = Guid.NewGuid().ToString();
+
+        var (status, title, detail, logLevel) = ex switch
+        {
+            ArgumentException => (
+                StatusCodes.Status400BadRequest,
+                "Invalid request",
+                ex.Message,
+                LogLevel.Warning
+            ),
+            _ => (
+                StatusCodes.Status500InternalServerError,
+                "Internal server error",
+                "An unexpected error occurred.",
+                LogLevel.Error
+            )
+        };
+
+        _logger.Log(logLevel, new EventId(eventId.GetHashCode()), ex, "{Title}. EventId: {EventId}", title, eventId);
+
+        var problem = new ProblemDetails
+        {
+            Status = status,
+            Title = title,
+            Detail = detail,
+            Instance = context.Request.Path
+        };
+
+        problem.Extensions["eventId"] = eventId;
+
+        context.Response.StatusCode = status;
+        context.Response.ContentType = "application/problem+json";
+        var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+
+        await context.Response.WriteAsJsonAsync(problem, options, "application/problem+json");
+    }
 }
+
 

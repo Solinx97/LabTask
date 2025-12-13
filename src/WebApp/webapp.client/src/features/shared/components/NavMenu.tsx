@@ -5,9 +5,6 @@ import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { Container, Navbar, NavbarBrand } from 'reactstrap';
 import LanguageSelector from './LanguageSelector';
-import { useLogoutMutation } from '@/features/user/api/User.api';
-import { useDispatch } from 'react-redux';
-import { updateUser } from '@/features/user/store/UserSlice';
 import { useAuth } from '@/features/user/hooks/useAuth';
 
 import './NavMenu.scss';
@@ -15,14 +12,11 @@ import './NavMenu.scss';
 const NavMenu: React.FC = () => {
     const { t } = useTranslation('translate');
 
-    const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const auth = useAuth();
 
     const user = useSelector((state: RootState) => state.user.value);
-
-    const [logout] = useLogoutMutation();
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -35,17 +29,6 @@ const NavMenu: React.FC = () => {
 
         checkAuth();
     }, []);
-
-    const logoutAsync = async () => {
-        try {
-            await logout().unwrap();
-            dispatch(updateUser(null));
-
-            navigate("/");
-        } catch (e) {
-            console.log(e);
-        }
-    }
 
     return (
         <header>
@@ -68,7 +51,7 @@ const NavMenu: React.FC = () => {
                             {auth?.isAuthenticated
                                 ? <div className="authorized">
                                     <div className="username">{user?.email}</div>
-                                    <div className="authorized__logout" onClick={logoutAsync}>{t("Logout")}</div>
+                                    <div className="authorized__logout" onClick={auth?.logoutAsync}>{t("Logout")}</div>
                                 </div>
                                 : <div className="authorization">
                                     <div className="authorization__login" onClick={() => navigate("/login")}>{t("Login")}</div>

@@ -4,5 +4,7 @@ using MediatR;
 namespace LabTask.Application.Queries.GetHistoryByUserId;
 
 public record GetHistoryByUserIdQuery(
-    Guid UserId
+    Guid UserId,
+    int Page,
+    int PageSize
     ) : IRequest<IEnumerable<DocumentDto>>;

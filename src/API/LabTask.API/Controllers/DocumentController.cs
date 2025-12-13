@@ -3,7 +3,6 @@ using LabTask.Application.Commands.DeleteDocument;
 using LabTask.Application.Commands.UpdateDocument;
 using LabTask.Application.DTOs;
 using LabTask.Application.Queries.GetActualDocumentsByUserId;
-using LabTask.Application.Queries.GetAllDocuments;
 using LabTask.Application.Queries.GetDocument;
 using LabTask.Application.Queries.GetHistoryByUserId;
 using MediatR;
@@ -27,14 +26,6 @@ public class DocumentController(IMediator mediator) : ControllerBase
         return Ok();
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
-    {
-        var documents = await _mediator.Send(new GetAllDocumentsQuery());
-
-        return Ok(documents);
-    }
-
     [HttpGet("getByName/{name}")]
     public async Task<IActionResult> GetByName(string name)
     {
@@ -52,9 +43,9 @@ public class DocumentController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("getHustoryByUserId/{id}")]
-    public async Task<IActionResult> GetHistoryByUserUd(Guid id)
+    public async Task<IActionResult> GetHistoryByUserUd(Guid id, int page, int pageSize)
     {
-        var documents = await _mediator.Send(new GetHistoryByUserIdQuery(id));
+        var documents = await _mediator.Send(new GetHistoryByUserIdQuery(id, page, pageSize));
 
         return Ok(documents);
     }
