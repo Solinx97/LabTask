@@ -101,11 +101,11 @@ public class DocumentController : ControllerBase
     }
 
     [HttpGet("getActualByUserId/{id}")]
-    public async Task<IActionResult> GetActualByUserId(Guid id)
+    public async Task<IActionResult> GetActualByUserId(Guid id, [FromQuery] int page, [FromQuery] int pageSize)
     {
         try
         {
-            var responseMessage = await _httpClient.GetAsync($"Document/getActualByUserId/{id}");
+            var responseMessage = await _httpClient.GetAsync($"Document/getActualByUserId/{id}?page={page}&pageSize={pageSize}");
             responseMessage.EnsureSuccessStatusCode();
 
             var documents = await responseMessage.Content.ReadFromJsonAsync<IEnumerable<DocumentModel>>();

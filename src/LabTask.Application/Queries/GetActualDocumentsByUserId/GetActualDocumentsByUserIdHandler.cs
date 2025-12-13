@@ -17,6 +17,8 @@ public class GetActualDocumentsByUserIdHandler(AppDbContext db) : IRequestHandle
         var documents = await _db.Set<Document>()
             .Where(o => o.UserId == request.UserId && o.ExpireAt >= now)
             .Select(o => new DocumentDto(o.Id, o.Name, o.Description, o.ExpireAt, o.UserId))
+            .Skip(request.Page * request.PageSize)
+            .Take(request.PageSize)
             .ToListAsync();
 
         return documents;

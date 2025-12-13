@@ -77,7 +77,7 @@ const Document: React.FC<{ t: (key: string) => string, userId: string, document:
         <>
             {(isEditMode && selectedDocumentId === document.id)
                 ?
-                <div className="documents__item">
+                <div className="container">
                     <input type="text" defaultValue={document.name} ref={nameRef} />
                     <textarea rows={6} defaultValue={document.description} ref={descriptiondRef} />
                     <div className="actions">
@@ -86,10 +86,10 @@ const Document: React.FC<{ t: (key: string) => string, userId: string, document:
                     </div>
                 </div>
                 :
-                <div className="documents__item">
-                    <div>{t("Name")}: {document.name}</div>
-                    <div>{t("Description")}: {document.description}</div>
-                    <div>{t("ExpireAt")}: {getTime(document.expireAt)}</div>
+                <div className="container">
+                    <div className="title" title={document.name}>{document.name}</div>
+                    <div className="description">{document.description}</div>
+                    <div className="expire-at">{getTime(document.expireAt)}</div>
                     <div className="actions">
                         <button className="btn-border-shadow" onClick={async () => await deleteAsync(document.id)}>{t("Delete")}</button>
                         <button className="btn-border-shadow" onClick={() => updateHandle(document.id)}>{t("Update")}</button>

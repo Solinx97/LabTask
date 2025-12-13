@@ -44,9 +44,9 @@ public class DocumentController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("getActualByUserId/{id}")]
-    public async Task<IActionResult> GetActualByUserId(Guid id)
+    public async Task<IActionResult> GetActualByUserId(Guid id, int page, int pageSize)
     {
-        var documents = await _mediator.Send(new GetActualDocumentsByUserIdQuery(id));
+        var documents = await _mediator.Send(new GetActualDocumentsByUserIdQuery(id, page, pageSize));
 
         return Ok(documents);
     }

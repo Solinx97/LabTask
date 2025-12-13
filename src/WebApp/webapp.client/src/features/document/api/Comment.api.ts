@@ -42,8 +42,8 @@ export const CommentApi = DocumentApi.injectEndpoints({
                     ]
                     : [{ type: 'Comment', id: 'LIST' }],
         }),
-        getCommentsByDocumentId: builder.query<CommentModel[], string>({
-            query: documentId => `/Comment/getByDocumentId/${documentId}`,
+        getCommentsByDocumentId: builder.query<CommentModel[], { documentId: string, page: number, pageSize: number }>({
+            query: ({ documentId, page, pageSize }) => `/Comment/getByDocumentId/${documentId}?page=${page}&pageSize=${pageSize}`,
             providesTags: result =>
                 result
                     ? [

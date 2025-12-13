@@ -54,8 +54,8 @@ export const DocumentApi = createApi({
             query: name => `/Document/getByName/${name}`,
             providesTags: result => result ? [{ type: 'Document', id: result.id }] : [],
         }),
-        getActualDocumentsByUserId: builder.query<DocumentModel[], string>({
-            query: userId => `/Document/getActualByUserId/${userId}`,
+        getActualDocumentsByUserId: builder.query<DocumentModel[], { userId: string, page: number, pageSize: number }>({
+            query: ({ userId, page, pageSize }) => `/Document/getActualByUserId/${userId}?page=${page}&pageSize=${pageSize}`,
             providesTags: result =>
                 result
                     ? [
@@ -84,5 +84,6 @@ export const {
     useGetAllDocumentsQuery,
     useLazyGetDocumentByNameQuery,
     useGetActualDocumentsByUserIdQuery,
+    useLazyGetActualDocumentsByUserIdQuery,
     useGetHistoryDocumentsByUserIdQuery,
 } = DocumentApi;

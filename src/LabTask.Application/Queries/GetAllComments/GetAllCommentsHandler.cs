@@ -15,6 +15,8 @@ internal class GetAllCommentsHandler(AppDbContext db) : IRequestHandler<GetAllCo
             .Where(d => d.Id == request.DocumentId)
             .SelectMany(d => d.Comments)
             .Select(c => new CommentDto(c.Id, c.Content, c.DocumentId, c.UserId))
+            .Skip(request.Page * request.PageSize)
+            .Take(request.PageSize)
             .ToListAsync(cancellationToken);
 
         return comments;
