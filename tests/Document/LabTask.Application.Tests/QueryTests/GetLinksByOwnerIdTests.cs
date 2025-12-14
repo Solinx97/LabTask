@@ -36,20 +36,20 @@ public class GetLinksByOwnerIdTests
         var mockRepository = new Mock<ILinkRepository>();
         var mockMapper = new Mock<IMapper>();
 
-        mockRepository.Setup(m => m.GetByOwnerIdAsync(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).ReturnsAsync(links);
+        mockRepository.Setup(m => m.GetByOwnerIdAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).ReturnsAsync(links);
         mockMapper.Setup(m => m.Map<IEnumerable<LinkDto>>(It.IsAny<IEnumerable<Link>>())).Returns(linksDto);
 
         var handler = new GetLinksByOwnerIdHandler(mockRepository.Object, mockMapper.Object);
 
         // Act
-        var result = await handler.Handle(new GetLinksByOwnerIdQuery(ownerId, page, pageSize), CancellationToken.None);
+        var result = await handler.Handle(new GetLinksByOwnerIdQuery(ownerId, documentId, page, pageSize), CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
         Assert.Single(result);
 
         // Verify
-        mockRepository.Verify(m => m.GetByOwnerIdAsync(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);
+        mockRepository.Verify(m => m.GetByOwnerIdAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);
         mockMapper.Verify(m => m.Map<IEnumerable<LinkDto>>(It.IsAny<IEnumerable<Link>>()), Times.Once);
     }
 }

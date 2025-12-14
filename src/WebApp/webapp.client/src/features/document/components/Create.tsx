@@ -1,5 +1,5 @@
 import { useCreateDocumentMutation } from '@/features/document/api/Document.api';
-import { useRef, type SetStateAction } from 'react';
+import { useRef, useState, type SetStateAction } from 'react';
 import type { DocumentModel } from '../types/DocumentModel';
 
 interface Props {
@@ -16,6 +16,8 @@ const Create:React.FC<Props> = ({ t, userId, setIsOpenCreate, getTime }) => {
 
     const [createDocument] = useCreateDocumentMutation();
 
+    const [isSomeProblems, setIsSomeProblems] = useState(false);
+
     const createAsync = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -23,6 +25,8 @@ const Create:React.FC<Props> = ({ t, userId, setIsOpenCreate, getTime }) => {
             if (!nameRef.current || !descriptiondRef.current) {
                 return;
             }
+
+            setIsSomeProblems(false);
 
             const document: DocumentModel = {
                 id: crypto.randomUUID(),
@@ -36,6 +40,7 @@ const Create:React.FC<Props> = ({ t, userId, setIsOpenCreate, getTime }) => {
 
             setIsOpenCreate(false);
         } catch (e) {
+            setIsSomeProblems(true);
             console.log(e);
         }
     }
@@ -60,6 +65,9 @@ const Create:React.FC<Props> = ({ t, userId, setIsOpenCreate, getTime }) => {
                     <input type="submit" className="btn-border-shadow" value={t("Create")} />
                     <input type="button" className="btn-border-shadow orange" value={t("Cancel")} onClick={() => setIsOpenCreate(false)} />
                 </div>
+                {isSomeProblems &&
+                    <div className="alert alert-warning">{t("SomeProblemsDuringCreation")}</div>
+                }
             </form>
         </div>
     );

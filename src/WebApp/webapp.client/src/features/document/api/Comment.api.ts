@@ -10,18 +10,6 @@ export const CommentApi = DocumentApi.injectEndpoints({
                 method: 'POST'
             }),
             async onQueryStarted(comment, { dispatch, queryFulfilled }) {
-                const patches = [
-                    dispatch(
-                        CommentApi.util.updateQueryData(
-                            'getCommentsByDocumentId',
-                            { documentId: comment.documentId },
-                            draft => {
-                                draft.unshift(comment);
-                            }
-                        )
-                    ),
-                ];
-
                 try {
                     const { data: created } = await queryFulfilled;
 
@@ -30,15 +18,12 @@ export const CommentApi = DocumentApi.injectEndpoints({
                             'getCommentsByDocumentId',
                             { documentId: created.documentId },
                             draft => {
-                                const index = draft.findIndex(l => l.id === comment.id);
-                                if (index !== -1) {
-                                    draft[index] = created;
-                                }
+                                draft.unshift(created);
                             }
                         )
                     );
                 } catch {
-                    patches.forEach(p => p.undo());
+                    console.log("Some problems during create a new Comment.");
                 }
             },
         }),

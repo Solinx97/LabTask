@@ -6,6 +6,7 @@
   "NoAnyDocuments": "Нет доступных документов",
   "NoAnyComments": "Нет доступных комментариев",
   "NoAnyLinks": "Нет доступных ссылок",
+  "NoAnyStatistics": "Нет доступной статистики",
   "Links": "Ссылки",
   "Save": "Сохранить",
   "Cancel": "Отмена",
@@ -36,5 +37,6 @@
   "Year": "Год",
   "CreatedAtDocumentCount": "Документ создан (кол-во)",
   "UpdatedAtDocumentCount": "Документ обновлен (кол-во)",
-  "ExpiredAtDocumentCount": "Время документа истекает (кол-во)"
+  "ExpiredAtDocumentCount": "Время документа истекает (кол-во)",
+  "SomeProblemsDuringCreation": "Возникли проблемы при создании"
 }

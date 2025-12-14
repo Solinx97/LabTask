@@ -18,10 +18,14 @@ const StatisticsByRange: React.FC<Props> = ({ t, userId, getTime }) => {
 
     const getStatisticsAsync = async () => {
         try {
+            if (!startedAtRef.current || !finishedAtRef.current) {
+                return;
+            }
+
             const agrs = {
                 userId: userId,
-                startedAt: "",
-                finishedAt: ""
+                startedAt: startedAtRef.current.value,
+                finishedAt: finishedAtRef.current.value
             };
 
             var statistiscs = await getStatistics(agrs).unwrap();
@@ -32,26 +36,29 @@ const StatisticsByRange: React.FC<Props> = ({ t, userId, getTime }) => {
     }
 
     return (
-        <div>
+        <div className="statistics">
             <div>{t("SelectRange")}</div>
             <div className="mb-3">
-                <label htmlFor="expires">{t("StartedAt")}</label>
-                <input className="form-control" type="datetime-local" defaultValue={getTime()} ref={startedAtRef} />
+                <label htmlFor="startedAt">{t("StartedAt")}</label>
+                <input className="form-control" type="datetime-local" id="startedAt" defaultValue={getTime()} ref={startedAtRef} />
             </div>
             <div className="mb-3">
-                <label htmlFor="expires">{t("FinishedAt")}</label>
-                <input className="form-control" type="datetime-local" defaultValue={getTime()} ref={finishedAtRef} />
+                <label htmlFor="finishedAt">{t("FinishedAt")}</label>
+                <input className="form-control" type="datetime-local" id="finishedAt" defaultValue={getTime()} ref={finishedAtRef} />
             </div>
             <button className="btn-border-shadow" onClick={getStatisticsAsync}>{t("Get")}</button>
-            <ul>{statistics.map((statistic, index) => (
-                <li key={index}>
-                    <p>{t("Year")}: {statistic.year}</p>
-                    <p>{t("CreatedAtDocumentCount")}: {statistic.createdAtCount}</p>
-                    <p>{t("UpdatedAtDocumentCount")}: {statistic.updatedAtCount}</p>
-                    <p>{t("ExpiredAtDocumentCount")}: {statistic.expiredAtCount}</p>
-                </li>
-            ))}
-            </ul>
+            {statistics.length === 0
+                ? <div>{t("NoAnyStatistics")}</div>
+                : <ul className="statistics__content">{statistics.map((statistic, index) => (
+                    <li key={index}>
+                        <p>{t("Year")}: {statistic.year}</p>
+                        <p>{t("CreatedAtDocumentCount")}: {statistic.createdAtCount}</p>
+                        <p>{t("UpdatedAtDocumentCount")}: {statistic.updatedAtCount}</p>
+                        <p>{t("ExpiredAtDocumentCount")}: {statistic.expiredAtCount}</p>
+                    </li>
+                ))}
+                </ul>
+            }
         </div>
     );
 }

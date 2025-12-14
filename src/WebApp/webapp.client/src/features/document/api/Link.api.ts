@@ -10,27 +10,6 @@ export const LinkApi = DocumentApi.injectEndpoints({
                 method: 'POST'
             }),
             async onQueryStarted(link, { dispatch, queryFulfilled }) {
-                const patches = [
-                    dispatch(
-                        LinkApi.util.updateQueryData(
-                            'getLinksByUserId',
-                            { userId: link.toUserId },
-                            draft => {
-                                draft.unshift(link);
-                            }
-                        )
-                    ),
-                    dispatch(
-                        LinkApi.util.updateQueryData(
-                            'getLinksByOwnerId',
-                            { userId: link.ownerId },
-                            draft => {
-                                draft.unshift(link);
-                            }
-                        )
-                    ),
-                ];
-
                 try {
                     const { data: created } = await queryFulfilled;
 
@@ -39,27 +18,21 @@ export const LinkApi = DocumentApi.injectEndpoints({
                             'getLinksByUserId',
                             { userId: created.toUserId },
                             draft => {
-                                const index = draft.findIndex(l => l.id === link.id);
-                                if (index !== -1) {
-                                    draft[index] = created;
-                                }
+                                draft.unshift(created);
                             }
                         )
                     );
                     dispatch(
                         LinkApi.util.updateQueryData(
                             'getLinksByOwnerId',
-                            { userId: created.ownerId },
+                            { userId: created.ownerId, documentId: created.documentId },
                             draft => {
-                                const index = draft.findIndex(l => l.id === link.id);
-                                if (index !== -1) {
-                                    draft[index] = created;
-                                }
+                                draft.unshift(created);
                             }
                         )
                     );
                 } catch {
-                    patches.forEach(p => p.undo());
+                    console.log("Some problems during create a new Link.");
                 }
             },
         }),
@@ -124,9 +97,9 @@ export const LinkApi = DocumentApi.injectEndpoints({
                     ]
                     : [{ type: 'Link', id: 'LIST' }],
         }),
-        getLinksByOwnerId: builder.query<LinkModel[], { userId: string, page: number, pageSize: number }>({
-            query: ({ userId, page, pageSize }) => `/Link/getByOwnerId/${userId}?page=${page}&pageSize=${pageSize}`,
-            serializeQueryArgs: ({ endpointName, queryArgs }) => `${endpointName}-${queryArgs.userId}`,
+        getLinksByOwnerId: builder.query<LinkModel[], { userId: string, documentId: string, page: number, pageSize: number }>({
+            query: ({ userId, documentId, page, pageSize }) => `/Link/getByOwnerId/${userId}?documentId=${documentId}&page=${page}&pageSize=${pageSize}`,
+            serializeQueryArgs: ({ endpointName, queryArgs }) => `${endpointName}-${queryArgs.userId}-${queryArgs.documentId}`,
             merge: (currentCache, newItems) => {
                 newItems.forEach(item => {
                     const index = currentCache.findIndex(d => d.id === item.id);

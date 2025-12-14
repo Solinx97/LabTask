@@ -132,7 +132,7 @@ public class DocumentController : ControllerBase
     }
 
     [HttpGet("getExpiredDocumentsByUserId/{id}")]
-    public async Task<IActionResult> GetHustoryByUserId(Guid id, [FromQuery] int page, [FromQuery] int pageSize)
+    public async Task<IActionResult> GetExpiredDocumentsByUserId(Guid id, [FromQuery] int page, [FromQuery] int pageSize)
     {
         var response = await _httpClient.GetAsync($"Document/getExpiredDocumentsByUserId/{id}?page={page}&pageSize={pageSize}");
 
@@ -186,9 +186,9 @@ public class DocumentController : ControllerBase
     }
 
     [HttpGet("statisticsByRange/{id}")]
-    public async Task<IActionResult> StatisticsByRange(Guid id, [FromQuery] DateTimeOffset startedAt, [FromQuery] DateTimeOffset finishedAt)
+    public async Task<IActionResult> StatisticsByRange(Guid id, [FromQuery] DateTime startedAt, [FromQuery] DateTime finishedAt)
     {
-        var response = await _httpClient.GetAsync($"Document/statisticsByYear/{id}?startedAt={startedAt}&finishedAt={finishedAt}");
+        var response = await _httpClient.GetAsync($"Document/statisticsByRange/{id}?startedAt={startedAt}&finishedAt={finishedAt}");
 
         if (response.IsSuccessStatusCode)
         {

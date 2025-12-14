@@ -51,6 +51,12 @@ $mobile-max-width: 425px;
     }
 }
 
+.alert-warning {
+    margin: 20px 0;
+    text-align: center;
+    font-size: 0.75em;
+}
+
 .documents.actions {
     justify-content: flex-end;
 }
@@ -130,10 +136,6 @@ $mobile-max-width: 425px;
             display: flex;
             flex-direction: column;
             align-items: left;
-        }
-
-        .alert-success {
-            margin: 20px 0;
         }
     }
 
@@ -233,5 +235,21 @@ $mobile-max-width: 425px;
     .manage {
         display: flex;
         gap: 30px;
+    }
+}
+
+.accordion-body {
+    color: white;
+    background: #0c192c;
+
+    .statistics {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+
+        &__content {
+            margin: 10px 0;
+        }
     }
 }

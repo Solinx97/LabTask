@@ -70,7 +70,7 @@ public class DocumentController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("statisticsByRange/{id}")]
-    public async Task<IActionResult> StatisticsByRange(Guid id, DateTimeOffset startedAt, DateTimeOffset finishedAt)
+    public async Task<IActionResult> StatisticsByRange(Guid id, DateTime startedAt, DateTime finishedAt)
     {
         var statistics = await _mediator.Send(new DocumentStatisticsByRangeQuery(id, startedAt, finishedAt));
 

@@ -1,5 +1,5 @@
 import { useUsersQuery } from '@/features/user/api/User.api';
-import { useCreateLinkMutation, useGetLinksByOwnerIdQuery } from '@/features/document/api/Link.api';
+import { useCreateLinkMutation } from '@/features/document/api/Link.api';
 import Loading from '@/features/shared/components/Loading';
 import { useRef, useState, type SetStateAction } from 'react';
 import type { LinkModel } from '../types/LinkModel';
@@ -14,16 +14,14 @@ interface Props {
 }
 
 const CreateLink: React.FC<Props> = ({ t, userId, document, setIsCreateLinkOpen, getTime }) => {
-    const pageSizeRef = useRef<number>(5);
     const userRef = useRef<HTMLSelectElement | null>(null);
     const expiresAtRef = useRef<HTMLInputElement | null>(null);
-
-    const [page, setPage] = useState(0);
 
     const [createLink] = useCreateLinkMutation();
 
     const { data: users, isLoading } = useUsersQuery();
-    const { data: ownLinks, isLoading: linkIsLoading } = useGetLinksByOwnerIdQuery({ userId, page: page, pageSize: pageSizeRef.current });
+
+    const [isSomeProblems, setIsSomeProblems] = useState(false);
 
     const createAsync = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -32,6 +30,8 @@ const CreateLink: React.FC<Props> = ({ t, userId, document, setIsCreateLinkOpen,
             if (!userRef.current || !expiresAtRef.current) {
                 return;
             }
+            
+            setIsSomeProblems(false);
 
             const link: LinkModel = {
                 id: crypto.randomUUID(),
@@ -41,15 +41,18 @@ const CreateLink: React.FC<Props> = ({ t, userId, document, setIsCreateLinkOpen,
                 toUserId: userRef.current ? userRef.current.value : "",
                 expireAt: expiresAtRef.current ? expiresAtRef.current.value : "",
             };
+
             await createLink(link).unwrap();
 
             userRef.current.value = "";
         } catch (e) {
+            setIsSomeProblems(true);
+
             console.log(e);
         }
     }
 
-    if (isLoading || !users || linkIsLoading || !ownLinks) {
+    if (isLoading || !users) {
         return (<Loading />);
     }
 
@@ -78,6 +81,9 @@ const CreateLink: React.FC<Props> = ({ t, userId, document, setIsCreateLinkOpen,
                 <input type="submit" className="btn-border-shadow" value={t("Create")} />
                 <input type="button" className="btn-border-shadow orange" value={t("Cancel")} onClick={() => setIsCreateLinkOpen(false)} />
             </div>
+            {isSomeProblems &&
+                <div className="alert alert-warning">{t("SomeProblemsDuringCreation")}</div>
+            }
         </form>
     )
 }

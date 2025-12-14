@@ -120,4 +120,16 @@ internal class DocumentRepository(AppDbContext dbContext) : GenericRepository<Do
 
         return documents;
     }
+
+    public async Task<IEnumerable<int>> GetCreatedYearsAsync(Guid userId, CancellationToken ct = default)
+    {
+        var years = await _dbContext.Document
+            .Where(o => o.UserId == userId)
+            .OrderBy(d => d.Id)
+            .Select(d => d.CreatedAt.Year)
+            .Distinct()
+            .ToListAsync(ct);
+
+        return years;
+    }
 }

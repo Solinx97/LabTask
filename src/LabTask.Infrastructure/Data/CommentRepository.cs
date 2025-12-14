@@ -12,8 +12,8 @@ internal class CommentRepository(AppDbContext dbContext) : GenericRepository<Com
     public async Task<IEnumerable<Comment>> GetByDocumentIdAsync(Guid documentId, int page, int pageSize, CancellationToken ct = default)
     {
         var comments = await _dbContext.Comment
-            .Where(d => d.DocumentId == documentId)
-            .OrderBy(d => d.Id)
+            .Where(c => c.DocumentId == documentId)
+            .OrderBy(c => c.Id)
             .Skip(page * pageSize)
             .Take(pageSize)
             .ToListAsync(ct);

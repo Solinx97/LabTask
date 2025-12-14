@@ -22,27 +22,6 @@ export const DocumentApi = createApi({
                 method: 'POST'
             }),
             async onQueryStarted(document, { dispatch, queryFulfilled }) {
-                const patches = [
-                    dispatch(
-                        DocumentApi.util.updateQueryData(
-                            'getActualDocumentsByUserId',
-                            { userId: document.userId },
-                            draft => {
-                                draft.unshift(document);
-                            }
-                        )
-                    ),
-                    dispatch(
-                        DocumentApi.util.updateQueryData(
-                            'getHistoryDocumentsByUserId',
-                            { userId: document.userId },
-                            draft => {
-                                draft.unshift(document);
-                            }
-                        )
-                    ),
-                ];
-
                 try {
                     const { data: created } = await queryFulfilled;
 
@@ -51,27 +30,21 @@ export const DocumentApi = createApi({
                             'getActualDocumentsByUserId',
                             { userId: created.userId },
                             draft => {
-                                const index = draft.findIndex(l => l.id === document.id);
-                                if (index !== -1) {
-                                    draft[index] = created;
-                                }
+                                draft.unshift(created);
                             }
                         )
                     );
                     dispatch(
                         DocumentApi.util.updateQueryData(
-                            'getHistoryDocumentsByUserId',
+                            'getExpiredDocumentsByUserId',
                             { userId: created.userId },
                             draft => {
-                                const index = draft.findIndex(l => l.id === document.id);
-                                if (index !== -1) {
-                                    draft[index] = created;
-                                }
+                                draft.unshift(created);
                             }
                         )
                     );
                 } catch {
-                    patches.forEach(p => p.undo());
+                    console.log("Some problems during create a new Document.");
                 }
             },
         }),
@@ -220,7 +193,7 @@ export const DocumentApi = createApi({
             query: (userId) => `/Document/statisticsByYear/${userId}`,
         }),
         getDocumentStatisticsByRange: builder.query<StatisticModel[], { userId: string, startedAt: string, finishedAt: string }>({
-            query: ({ userId, startedAt, finishedAt }) => `/Document/statisticsByYear/${userId}?startedAt${startedAt}&finishedAt=${finishedAt}`,
+            query: ({ userId, startedAt, finishedAt }) => `/Document/statisticsByRange/${userId}?startedAt=${startedAt}&finishedAt=${finishedAt}`,
         }),
     })
 })

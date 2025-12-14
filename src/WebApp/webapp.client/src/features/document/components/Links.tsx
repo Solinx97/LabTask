@@ -25,7 +25,7 @@ const Links: React.FC<Props> = ({ t, userId, document, setIsOpenLinks, getTime }
     const [deleteLink] = useDeleteLinkMutation();
 
     const { data: users, isLoading } = useUsersQuery();
-    const { data: ownLinks, isLoading: linkIsLoading } = useGetLinksByOwnerIdQuery({ userId, page: page, pageSize: pageSizeRef.current });
+    const { data: ownLinks, isLoading: linkIsLoading } = useGetLinksByOwnerIdQuery({ userId, documentId: document?.id ?? "", page: page, pageSize: pageSizeRef.current });
 
     const deleteAsync = async (id: string) => {
         try {

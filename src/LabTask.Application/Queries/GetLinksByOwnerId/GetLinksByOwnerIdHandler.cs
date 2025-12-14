@@ -12,7 +12,7 @@ internal class GetLinksByOwnerIdHandler(ILinkRepository repository, IMapper mapp
 
     public async Task<IEnumerable<LinkDto>> Handle(GetLinksByOwnerIdQuery request, CancellationToken ct)
     {
-        var links = await _repository.GetByOwnerIdAsync(request.OwnerId, request.Page, request.PageSize, ct);
+        var links = await _repository.GetByOwnerIdAsync(request.OwnerId, request.DocumentId, request.Page, request.PageSize, ct);
         var map = _mapper.Map<IEnumerable<LinkDto>>(links);
 
         return map;

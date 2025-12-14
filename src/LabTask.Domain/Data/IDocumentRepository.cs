@@ -1,6 +1,5 @@
 ﻿using LabTask.Domain.Aggregates;
 using LabTask.Domain.Helpers;
-using System.Threading.Tasks;
 
 namespace LabTask.Domain.Data;
 
@@ -17,4 +16,6 @@ public interface IDocumentRepository : IGenericRepository<Document>
     Task<IEnumerable<Document>> GetExpiredDocumentsAsync(Guid userId, int page, int pageSize, CancellationToken ct = default);
 
     Task<IEnumerable<Document>> GetDocumentByNameAsync(Guid userId, string name, CancellationToken ct = default);
+
+    Task<IEnumerable<int>> GetCreatedYearsAsync(Guid userId, CancellationToken ct = default);
 }

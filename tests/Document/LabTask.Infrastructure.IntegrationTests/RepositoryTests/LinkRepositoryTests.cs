@@ -46,7 +46,7 @@ public class LinkRepositoryTests(SqlServerFixture fixture)
         await context.SaveChangesAsync();
 
         // Act
-        var result = await repo.GetByOwnerIdAsync(ownerId, page, pagSize);
+        var result = await repo.GetByOwnerIdAsync(ownerId, docs[0].Id, page, pagSize);
 
         // Assert
         Assert.NotNull(result);

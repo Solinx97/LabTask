@@ -79,9 +79,9 @@ public class LinkController : ControllerBase
     }
 
     [HttpGet("getByOwnerId/{id}")]
-    public async Task<IActionResult> GetByOwnerId(Guid id, [FromQuery] int page, [FromQuery] int pageSize)
+    public async Task<IActionResult> GetByOwnerId(Guid id, Guid documentId, [FromQuery] int page, [FromQuery] int pageSize)
     {
-        var response = await _httpClient.GetAsync($"Link/getByOwnerId/{id}?page={page}&pageSize={pageSize}");
+        var response = await _httpClient.GetAsync($"Link/getByOwnerId/{id}?documentId={documentId}&page={page}&pageSize={pageSize}");
 
         if (response.IsSuccessStatusCode)
         {

@@ -32,9 +32,9 @@ public class LinkController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("getByOwnerId/{id}")]
-    public async Task<IActionResult> GetByOwnerId(Guid id, int page, int pageSize)
+    public async Task<IActionResult> GetByOwnerId(Guid id, Guid documentId, int page, int pageSize)
     {
-        var links = await _mediator.Send(new GetLinksByOwnerIdQuery(id, page, pageSize));
+        var links = await _mediator.Send(new GetLinksByOwnerIdQuery(id, documentId, page, pageSize));
 
         return Ok(links);
     }

@@ -9,12 +9,12 @@ internal class LinkRepository(AppDbContext dbContext) : GenericRepository<Link>(
 {
     private readonly AppDbContext _dbContext = dbContext;
 
-    public async Task<IEnumerable<Link>> GetByOwnerIdAsync(Guid ownerId, int page, int pageSize, CancellationToken ct = default)
+    public async Task<IEnumerable<Link>> GetByOwnerIdAsync(Guid ownerId, Guid documentId, int page, int pageSize, CancellationToken ct = default)
     {
         var links = await _dbContext.Link
             .AsNoTracking()
-            .Where(d => d.OwnerId == ownerId)
-            .OrderBy(d => d.Id)
+            .Where(l => l.OwnerId == ownerId && l.DocumentId == documentId)
+            .OrderBy(l => l.Id)
             .Skip(page * pageSize)
             .Take(pageSize)
             .ToListAsync(ct);
@@ -26,8 +26,8 @@ internal class LinkRepository(AppDbContext dbContext) : GenericRepository<Link>(
     {
         var links = await _dbContext.Link
             .AsNoTracking()
-            .Where(d => d.ToUserId == userId)
-            .OrderBy(d => d.Id)
+            .Where(l => l.ToUserId == userId)
+            .OrderBy(l => l.Id)
             .Skip(page * pageSize)
             .Take(pageSize)
             .ToListAsync(ct);

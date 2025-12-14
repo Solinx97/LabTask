@@ -6,6 +6,7 @@
   "NoAnyDocuments": "No any documents",
   "NoAnyComments": "No any comments",
   "NoAnyLinks": "No any links",
+  "NoAnyStatistics": "No any statistics",
   "Links": "Links",
   "Save": "Save",
   "Cancel": "Cancel",
@@ -35,5 +36,6 @@
   "Year": "Year",
   "CreatedAtDocumentCount": "Created at document (count)",
   "UpdatedAtDocumentCount": "Updated at document (count)",
-  "ExpiredAtDocumentCount": "Expired at document (count)"
+  "ExpiredAtDocumentCount": "Expired at document (count)",
+  "SomeProblemsDuringCreation": "Some problems during creation."
 }
