@@ -20,4 +20,11 @@
     <Project Path="src/WebApp/WebApp.Server/WebApp.Server.csproj" Id="cf62fabd-a233-4706-a2eb-5b4af666a5a4" />
   </Folder>
   <Folder Name="/tests/" />
+  <Folder Name="/tests/Common/">
+    <Project Path="tests/Common/LabTask.UserDAL.IntegrationTests/LabTask.UserDAL.IntegrationTests.csproj" Id="b8fbc9f8-82d3-4da2-a5ba-c76106c10770" />
+  </Folder>
+  <Folder Name="/tests/Document/">
+    <Project Path="tests/Document/LabTask.Application.Tests/LabTask.Application.Tests.csproj" Id="8bff3f71-1a1f-487a-8bd3-45cf01ef8d0f" />
+    <Project Path="tests/Document/LabTask.Infrastructure.IntegrationTests/LabTask.Infrastructure.IntegrationTests.csproj" Id="240d7e3f-b080-4be8-8110-f5d302521ec2" />
+  </Folder>
 </Solution>

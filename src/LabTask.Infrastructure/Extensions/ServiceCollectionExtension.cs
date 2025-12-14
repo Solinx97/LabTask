@@ -18,9 +18,13 @@ public static class ServiceCollectionExtension
         });
 
         services.AddScoped<IGenericRepository<Document>, GenericRepository<Document>>();
-        services.AddScoped<IDocumentRepository, DocumentRepository>();
         services.AddScoped<IGenericRepository<Comment>, GenericRepository<Comment>>();
         services.AddScoped<IGenericRepository<Link>, GenericRepository<Link>>();
+
+        services.AddScoped<IDocumentRepository, DocumentRepository>();
+        services.AddScoped<ICommentRepository, CommentRepository>();
+        services.AddScoped<ILinkRepository, LinkRepository>();
+
         services.AddScoped<IUnitOfWork, UnitOfWork>();
     }
 }

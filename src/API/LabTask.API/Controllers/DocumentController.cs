@@ -6,8 +6,8 @@ using LabTask.Application.Queries.DocumentStatisticsByRange;
 using LabTask.Application.Queries.DocumentStatisticsByYear;
 using LabTask.Application.Queries.GetActualDocumentsByUserId;
 using LabTask.Application.Queries.GetDocument;
-using LabTask.Application.Queries.GetDocumentByName;
-using LabTask.Application.Queries.GetHistoryByUserId;
+using LabTask.Application.Queries.GetDocumentsByName;
+using LabTask.Application.Queries.GetExpiredDocumentsByUserId;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -37,10 +37,10 @@ public class DocumentController(IMediator mediator) : ControllerBase
         return Ok(document);
     }
 
-    [HttpGet("getByName/{name}")]
-    public async Task<IActionResult> GetByName(string name)
+    [HttpGet("getByName/{id}")]
+    public async Task<IActionResult> GetByName(Guid id, string name)
     {
-        var documents = await _mediator.Send(new GetDocumentByNameQuery(name));
+        var documents = await _mediator.Send(new GetDocumentsByNameQuery(id, name));
 
         return Ok(documents);
     }
@@ -53,10 +53,10 @@ public class DocumentController(IMediator mediator) : ControllerBase
         return Ok(documents);
     }
 
-    [HttpGet("getHustoryByUserId/{id}")]
+    [HttpGet("getExpiredDocumentsByUserId/{id}")]
     public async Task<IActionResult> GetHistoryByUserUd(Guid id, int page, int pageSize)
     {
-        var documents = await _mediator.Send(new GetHistoryByUserIdQuery(id, page, pageSize));
+        var documents = await _mediator.Send(new GetExpiredDocumentsByUserIdQuery(id, page, pageSize));
 
         return Ok(documents);
     }

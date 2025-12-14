@@ -12,7 +12,7 @@ internal class CreateCommentHandler(IGenericRepository<Comment> repository, IUni
     public async Task<Comment> Handle(CreateCommentCommand request, CancellationToken ct)
     {
         var comment = Comment.Create(request.Content, request.DocumentId, request.UserId);
-        await _repository.AddAsync(comment);
+        await _repository.AddAsync(comment, ct);
 
         await _unitOfWork.SaveChangesAsync(ct);
 

@@ -12,7 +12,7 @@ internal class CreateDocumentHandler(IGenericRepository<Document> repository, IU
     public async Task<Document> Handle(CreateDocumentCommand request, CancellationToken ct)
     {
         var document = Document.Create(request.Name, request.Description, request.ExpireAt, request.UserId);
-        await _repository.AddAsync(document);
+        await _repository.AddAsync(document, ct);
 
         await _unitOfWork.SaveChangesAsync(ct);
 

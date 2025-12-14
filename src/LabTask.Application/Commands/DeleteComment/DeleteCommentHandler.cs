@@ -1,5 +1,4 @@
 ﻿using LabTask.Domain.Data;
-using LabTask.Domain.Exceptions;
 using MediatR;
 
 namespace LabTask.Application.Commands.DeleteComment;
@@ -11,8 +10,7 @@ internal class DeleteCommentHandler(IDocumentRepository repository, IUnitOfWork 
 
     public async Task Handle(DeleteCommentCommand request, CancellationToken ct)
     {
-        var document = await _repository.GetByIdAsync(request.DocumentId, request.Id, ct) 
-            ?? throw new DomainException($"Document {request.DocumentId} not found");
+        var document = await _repository.GetByIdAsync(request.DocumentId, request.Id, ct);
 
         document?.DeleteComment(request.Id);
 

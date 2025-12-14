@@ -1,30 +1,17 @@
-﻿using LabTask.Application.Helper;
-using LabTask.Infrastructure.Persistence;
+﻿using LabTask.Domain.Data;
+using LabTask.Domain.Helpers;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace LabTask.Application.Queries.DocumentStatisticsByRange;
 
-internal class DocumentStatisticsByRangeHandler(AppDbContext db) : IRequestHandler<DocumentStatisticsByRangeQuery, IEnumerable<StatisticByYear>>
+internal class DocumentStatisticsByRangeHandler(IDocumentRepository repository) : IRequestHandler<DocumentStatisticsByRangeQuery, IEnumerable<Statistic>>
 {
-    private readonly AppDbContext _db = db;
+    private readonly IDocumentRepository _repository = repository;
 
-    public async Task<IEnumerable<StatisticByYear>> Handle(DocumentStatisticsByRangeQuery request, CancellationToken ct)
+    public async Task<IEnumerable<Statistic>> Handle(DocumentStatisticsByRangeQuery request, CancellationToken ct)
     {
-        var statistic = await _db.Document
-            .Where(doc => doc.UserId == request.UserId 
-                    && (doc.CreatedAt >= request.StartedAt && doc.CreatedAt <= request.FinishedAt))
-            .GroupBy(doc => doc.CreatedAt.Year)
-            .Select(g => new StatisticByYear
-            {
-                Year = g.Key,
-                CreatedAtCount = g.Count(),
-                UpdatedAtCount = g.Count(x => x.UpdatedAt != null && (x.UpdatedAt.Value >= request.StartedAt && x.UpdatedAt.Value <= request.FinishedAt)),
-                ExpiredAtCount = g.Count(x => x.ExpireAt >= request.StartedAt && x.ExpireAt <= request.FinishedAt),
-            })
-            .OrderBy(s => s.Year)
-            .ToListAsync(ct);
+        var statistics = await _repository.GetStatisticsAsync(request.UserId, request.StartedAt, request.FinishedAt, ct);
 
-        return statistic;
+        return statistics;
     }
 }

@@ -162,8 +162,8 @@ export const DocumentApi = createApi({
             query: id => `/Document/${id}`,
             providesTags: result => result ? [{ type: 'Document', id: result.id }] : [],
         }),
-        getDocumentByName: builder.query<DocumentModel[], string>({
-            query: name => `/Document/getByName/${name}`,
+        getDocumentByName: builder.query<DocumentModel[], { userId: string, name: string }>({
+            query: ({ userId, name }) => `/Document/getByName/${userId}?name=${name}`,
             providesTags: result =>
                 result
                     ? [
@@ -194,8 +194,8 @@ export const DocumentApi = createApi({
                     ]
                     : [{ type: 'Document', id: 'LIST' }],
         }),
-        getHistoryDocumentsByUserId: builder.query<DocumentModel[], { userId: string, page: number, pageSize: number }>({
-            query: ({ userId, page, pageSize }) => `/Document/getHustoryByUserId/${userId}?page=${page}&pageSize=${pageSize}`,
+        getExpiredDocumentsByUserId: builder.query<DocumentModel[], { userId: string, page: number, pageSize: number }>({
+            query: ({ userId, page, pageSize }) => `/Document/getExpiredDocumentsByUserId/${userId}?page=${page}&pageSize=${pageSize}`,
             serializeQueryArgs: ({ endpointName, queryArgs }) => `${endpointName}-${queryArgs.userId}`,
             merge: (currentCache, newItems) => {
                 newItems.forEach(item => {
@@ -234,7 +234,7 @@ export const {
     useLazyGetDocumentByNameQuery,
     useGetActualDocumentsByUserIdQuery,
     useLazyGetActualDocumentsByUserIdQuery,
-    useGetHistoryDocumentsByUserIdQuery,
+    useGetExpiredDocumentsByUserIdQuery,
     useGetDocumentStatisticsByYearQuery,
     useLazyGetDocumentStatisticsByRangeQuery,
 } = DocumentApi;

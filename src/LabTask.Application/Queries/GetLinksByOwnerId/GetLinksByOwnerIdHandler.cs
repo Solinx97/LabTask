@@ -1,23 +1,20 @@
-﻿using LabTask.Application.DTOs;
-using LabTask.Infrastructure.Persistence;
+﻿using AutoMapper;
+using LabTask.Application.DTOs;
+using LabTask.Domain.Data;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace LabTask.Application.Queries.GetLinksByOwnerId;
 
-internal class GetLinksByOwnerIdHandler(AppDbContext db) : IRequestHandler<GetLinksByOwnerIdQuery, IEnumerable<LinkDto>>
+internal class GetLinksByOwnerIdHandler(ILinkRepository repository, IMapper mapper) : IRequestHandler<GetLinksByOwnerIdQuery, IEnumerable<LinkDto>>
 {
-    private readonly AppDbContext _db = db;
+    private readonly ILinkRepository _repository = repository;
+    private readonly IMapper _mapper = mapper;
 
     public async Task<IEnumerable<LinkDto>> Handle(GetLinksByOwnerIdQuery request, CancellationToken ct)
     {
-        var comments = await _db.Link
-            .Where(d => d.OwnerId == request.OwnerId)
-            .Select(c => new LinkDto(c.Id, c.Uri, c.DocumentId, c.OwnerId, c.ToUserId, c.ExpireAt))
-            .Skip(request.Page * request.PageSize)
-            .Take(request.PageSize)
-            .ToListAsync(ct);
+        var links = await _repository.GetByOwnerIdAsync(request.OwnerId, request.Page, request.PageSize, ct);
+        var map = _mapper.Map<IEnumerable<LinkDto>>(links);
 
-        return comments;
+        return map;
     }
 }

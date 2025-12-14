@@ -1,6 +1,8 @@
+using AutoMapper;
 using LabTask.API.Consts;
 using LabTask.API.Middlewares;
 using LabTask.Application.Extensions;
+using LabTask.Application.Mappers;
 using LabTask.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -17,6 +19,14 @@ builder.Services.AddInfrastructure(connection);
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 builder.Services.AddMediatorSource();
+
+var mappingConfig = new MapperConfiguration(mc =>
+{
+    mc.AddProfile(new DocumentMapper());
+});
+
+var mapper = mappingConfig.CreateMapper();
+builder.Services.AddSingleton(mapper);
 
 var authenticationOptions = new Authentication();
 builder.Configuration.Bind("Authentication", authenticationOptions);

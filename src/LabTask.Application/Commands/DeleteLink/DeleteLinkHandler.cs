@@ -11,7 +11,7 @@ internal class DeleteLinkHandler(IGenericRepository<Link> repository, IUnitOfWor
 
     public async Task Handle(DeleteLinkCommand request, CancellationToken ct)
     {
-        await _repository.DeletedAsync(request.Id);
+        await _repository.DeletedAsync(request.Id, ct);
         await _unitOfWork.SaveChangesAsync(ct);
     }
 }

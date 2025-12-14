@@ -1,6 +1,5 @@
 ﻿using LabTask.Domain.Aggregates;
 using LabTask.Domain.Data;
-using LabTask.Domain.Exceptions;
 using MediatR;
 
 namespace LabTask.Application.Commands.UpdateDocument;
@@ -12,8 +11,7 @@ internal class UpdateDocumentHandler(IGenericRepository<Document> repository, IU
 
     public async Task Handle(UpdateDocumentCommand request, CancellationToken ct)
     {
-        var document = await _repository.GetByIdAsync(request.Id, ct) 
-            ?? throw new DomainException($"Document {request.Id} not found");
+        var document = await _repository.GetByIdAsync(request.Id, ct);
 
         document.Edit(request.Name, request.Description);
 

@@ -11,7 +11,7 @@ public class DeleteDocumentHandler(IGenericRepository<Document> repository, IUni
 
     public async Task Handle(DeleteDocumentCommand request, CancellationToken ct)
     {
-        await _repository.DeletedAsync(request.Id);
+        await _repository.DeletedAsync(request.Id, ct);
         await _unitOfWork.SaveChangesAsync(ct);
     }
 }

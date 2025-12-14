@@ -131,10 +131,10 @@ public class DocumentController : ControllerBase
         return StatusCode((int)response.StatusCode);
     }
 
-    [HttpGet("getHustoryByUserId/{id}")]
+    [HttpGet("getExpiredDocumentsByUserId/{id}")]
     public async Task<IActionResult> GetHustoryByUserId(Guid id, [FromQuery] int page, [FromQuery] int pageSize)
     {
-        var response = await _httpClient.GetAsync($"Document/getHustoryByUserId/{id}?page={page}&pageSize={pageSize}");
+        var response = await _httpClient.GetAsync($"Document/getExpiredDocumentsByUserId/{id}?page={page}&pageSize={pageSize}");
 
         if (response.IsSuccessStatusCode)
         {

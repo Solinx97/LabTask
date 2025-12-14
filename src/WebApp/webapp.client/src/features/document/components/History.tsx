@@ -1,4 +1,4 @@
-import { useGetHistoryDocumentsByUserIdQuery } from '@/features/document/api/Document.api';
+import { useGetExpiredDocumentsByUserIdQuery } from '@/features/document/api/Document.api';
 import { useEffect, useRef, useState } from 'react';
 import Document from './Document';
 import InfiniteScrollTrigger from '@/events/InfiniteScrollTrigger';
@@ -16,7 +16,7 @@ const History: React.FC<Props> = ({ t, userId, getTime }) => {
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(false);
 
-    const { data: documents, isLoading } = useGetHistoryDocumentsByUserIdQuery({ userId, page: page, pageSize: pageSizeRef.current });
+    const { data: documents, isLoading } = useGetExpiredDocumentsByUserIdQuery({ userId, page: page, pageSize: pageSizeRef.current });
 
     useEffect(() => {
         if (!documents) {

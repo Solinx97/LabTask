@@ -1,23 +1,20 @@
-﻿using LabTask.Application.DTOs;
-using LabTask.Infrastructure.Persistence;
+﻿using AutoMapper;
+using LabTask.Application.DTOs;
+using LabTask.Domain.Data;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace LabTask.Application.Queries.GetLinksByUserId;
 
-internal class GetLinksByUserIdHandler(AppDbContext db) : IRequestHandler<GetLinksByUserIdQuery, IEnumerable<LinkDto>>
+internal class GetLinksByUserIdHandler(ILinkRepository repository, IMapper mapper) : IRequestHandler<GetLinksByUserIdQuery, IEnumerable<LinkDto>>
 {
-    private readonly AppDbContext _db = db;
+    private readonly ILinkRepository _repository = repository;
+    private readonly IMapper _mapper = mapper;
 
     public async Task<IEnumerable<LinkDto>> Handle(GetLinksByUserIdQuery request, CancellationToken ct)
     {
-        var comments = await _db.Link
-            .Where(d => d.ToUserId == request.ToUserId)
-            .Select(c => new LinkDto(c.Id, c.Uri, c.DocumentId, c.OwnerId, c.ToUserId, c.ExpireAt))
-            .Skip(request.Page * request.PageSize)
-            .Take(request.PageSize)
-            .ToListAsync(ct);
+        var links = await _repository.GetByUserIdAsync(request.ToUserId, request.Page, request.PageSize, ct);
+        var map = _mapper.Map<IEnumerable<LinkDto>>(links);
 
-        return comments;
+        return map;
     }
 }

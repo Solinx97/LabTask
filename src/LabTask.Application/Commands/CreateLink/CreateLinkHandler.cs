@@ -12,7 +12,7 @@ internal class CreateLinkHandler(IGenericRepository<Link> repository, IUnitOfWor
     public async Task<Link> Handle(CreateLinkCommand request, CancellationToken ct)
     {
         var comment = Link.Create(request.DocumentId, request.OwnerId, request.ToUserId, request.ExpireAt);
-        await _repository.AddAsync(comment);
+        await _repository.AddAsync(comment, ct);
 
         await _unitOfWork.SaveChangesAsync(ct);
 

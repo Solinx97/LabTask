@@ -49,7 +49,7 @@ const Documents: React.FC<Props> = ({ t, userId, getTime }) => {
                 return;
             }
 
-            const documents = await getDocumentByName(name).unwrap();
+            const documents = await getDocumentByName({ userId, name }).unwrap();
             setFilteredDocuments(documents);
         } catch (e) {
             console.log(e);
