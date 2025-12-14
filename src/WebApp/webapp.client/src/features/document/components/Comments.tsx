@@ -3,6 +3,8 @@ import Loading from '@/features/shared/components/Loading';
 import { useEffect, useRef, useState } from 'react';
 import type { CommentModel } from '../types/CommentModel';
 import InfiniteScrollTrigger from '@/events/InfiniteScrollTrigger';
+import { faTrash, faPen, faMessage } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 interface Props {
     t: (key: string) => string;
@@ -89,14 +91,22 @@ const Comments: React.FC<Props> = ({ t, documentId, userId, actionsAllow = true 
                                 <div>{comment.content}</div>
                                 {(actionsAllow && comment.userId === userId) &&
                                     <div className="actions">
-                                        <button className="btn-border-shadow" onClick={async () => await deleteAsync(comment.id)}>{t("Delete")}</button>
-                                        <button className="btn-border-shadow" onClick={() => updateHandle(comment.id)}>{t("Update")}</button>
+                                        <FontAwesomeIcon
+                                            className="danger"
+                                            icon={faTrash}
+                                            onClick={async () => await deleteAsync(comment.id)}
+                                        />
+                                        <FontAwesomeIcon
+                                            className="success"
+                                            icon={faPen}
+                                            onClick={() => updateHandle(comment.id)}
+                                        />
                                     </div>
                                 }
                             </div>
                         }
                     </li>
-                    ))}
+                ))}
                     <li>
                         <InfiniteScrollTrigger
                             onLoadMore={() => setPage(p => p + 1)}

@@ -1,12 +1,12 @@
 import { useUsersQuery } from '@/features/user/api/User.api';
-import { useCreateLinkMutation, useGetLinksByOwnerIdQuery, useDeleteLinkMutation } from '@/features/document/api/Link.api';
+import { useGetLinksByOwnerIdQuery, useDeleteLinkMutation } from '@/features/document/api/Link.api';
 import Loading from '@/features/shared/components/Loading';
 import { useRef, useState, type SetStateAction } from 'react';
-import type { LinkModel } from '../types/LinkModel';
 import type { DocumentModel } from '../types/DocumentModel';
 import User from '@/features/user/components/User';
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import CreateLink from './CreateLink';
 
 interface Props {
     t: (key: string) => string;
@@ -18,42 +18,14 @@ interface Props {
 
 const Links: React.FC<Props> = ({ t, userId, document, setIsOpenLinks, getTime }) => {
     const pageSizeRef = useRef<number>(5);
-    const userRef = useRef<HTMLSelectElement | null>(null);
-    const expiresAtRef = useRef<HTMLInputElement | null>(null);
 
     const [page, setPage] = useState(0);
+    const [isCreateLinkOpen, setIsCreateLinkOpen] = useState(false);
 
-    const [createLink] = useCreateLinkMutation();
     const [deleteLink] = useDeleteLinkMutation();
 
     const { data: users, isLoading } = useUsersQuery();
     const { data: ownLinks, isLoading: linkIsLoading } = useGetLinksByOwnerIdQuery({ userId, page: page, pageSize: pageSizeRef.current });
-
-    const createAsync = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-
-        try {
-            if (!userRef.current || !expiresAtRef.current) {
-                return;
-            }
-
-            const link: LinkModel = {
-                id: crypto.randomUUID(),
-                uri: crypto.randomUUID(),
-                documentId: document?.id ?? "",
-                ownerId: userId,
-                toUserId: userRef.current ? userRef.current.value : "",
-                expireAt: expiresAtRef.current ? expiresAtRef.current.value : "",
-            };
-            await createLink(link).unwrap();
-
-            userRef.current.value = "";
-
-            // setIsOpenLinks(false);
-        } catch (e) {
-            console.log(e);
-        }
-    }
 
     const deleteAsync = async (id: string) => {
         try {
@@ -68,50 +40,45 @@ const Links: React.FC<Props> = ({ t, userId, document, setIsOpenLinks, getTime }
     }
 
     return (
-        <form className="link modal-window" onSubmit={createAsync}>
-            <div className="link__title">{t("CreateLink")}</div>
-            <div className="form-group">
-                <label htmlFor="document-name">{t("DocumentName")}:</label>
-                <div className="col-sm-10">
-                    <input type="text" className="form-control-plaintext" id="document-name" value={document?.name} title={document?.name} readOnly />
-                </div>
-            </div>
-            <div className="form-group">
-                <label htmlFor="user">{t("CreateFor")}:</label>
-                <select className="form-control" name="user" id="user" ref={userRef}>
-                    {users.map(user => (
-                        <option key={user.id} value={user.id}>{user.email}</option>
-                    ))}
-                </select>
-            </div>
-            <div className="form-group">
-                <label htmlFor="expires">{t("ExpiresAt")}:</label>
-                <input className="form-control" type="datetime-local" defaultValue={getTime()} id="expires" name="expires" ref={expiresAtRef} required />
-            </div>
+        <div className="link modal-window">
             <div className="actions">
-                <input type="submit" className="btn-border-shadow" value={t("Create")} />
-                <input type="button" className="btn-border-shadow orange" value={t("Close")} onClick={() => setIsOpenLinks(false)} />
-            </div>
-            <div className="exist-links">
                 <div>{t("Links")}</div>
+                <FontAwesomeIcon
+                    icon={faPlus}
+                    onClick={() => setIsCreateLinkOpen(prev => !prev)}
+                />
+            </div>
+            {isCreateLinkOpen &&
+                <CreateLink
+                    t={t}
+                    userId={userId}
+                    document={document}
+                    setIsCreateLinkOpen={setIsCreateLinkOpen}
+                    getTime={getTime}
+                />
+            }
+            <div className="exist-links">
+                <div>{t("CreatedLinks")}</div>
                 {ownLinks.length === 0
                     ? <div>{t("NoAnyLinks")}</div>
-                    : <ul>{ownLinks.map(link => (
-                        <li key={link.id} className="exist-links__item">
+                    : <ul className="container">{ownLinks.map(link => (
+                        <li key={link.id} className="exist-links__item actions">
                             <User
                                 userId={link.toUserId}
                             />
                             <FontAwesomeIcon
+                                className="danger"
                                 icon={faTrash}
                                 onClick={async () => await deleteAsync(link.id)}
                             />
                         </li>
                     ))}
+                        <li className="exist-links__load-more" onClick={() => setPage(prev => prev + 1)}>{t("LoadMore")}</li>
                     </ul>
                 }
-
             </div>
-        </form>
+            <button className="btn-border-shadow" onClick={() => setIsOpenLinks(false)}>{t("Cancel")}</button>
+        </div>
     )
 }
 

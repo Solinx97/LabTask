@@ -26,7 +26,29 @@ $mobile-max-width: 425px;
     justify-content: center;
     align-items: center;
     width: 100%;
-    gap: 20px;
+    gap: 50px;
+    margin: 5px 0;
+
+    &__main {
+        display: flex;
+        gap: 20px;
+    }
+
+    svg {
+        cursor: pointer;
+
+        :hover {
+            transform: scale(1.2);
+        }
+    }
+
+    .danger {
+        color: orange;
+    }
+
+    .success {
+        color: green;
+    }
 }
 
 .documents.actions {
@@ -51,6 +73,18 @@ $mobile-max-width: 425px;
                 text-align: center;
             }
 
+            &__create {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+
+            }
+
+            .actions input,
+            .actions button {
+                font-size: 0.7em;
+            }
+
             .form-group {
                 display: flex;
                 flex-direction: column;
@@ -72,32 +106,21 @@ $mobile-max-width: 425px;
                     display: flex;
                     align-items: center;
                     gap: 10px;
-
-                    svg {
-                        color: orange;
-                        cursor: pointer;
-
-                        :hover {
-                            transform: scale(1.2);
-                        }
-                    }
                 }
-            }
-        }
-    }
 
-    .title {
-        display: flex;
-        align-items: center;
-        gap: $gap-medium;
+                &__load-more {
+                    display: flex;
+                    justify-content: center;
+                    margin: 5px 0;
+                    opacity: 0.6;
+                }
 
-        @keyframes need-be-authorize {
-            from {
-                width: 35px;
-            }
-
-            to {
-                width: 275px;
+                .container {
+                    max-height: 200px;
+                    padding: 10px;
+                    overflow-y: auto;
+                    cursor: pointer;
+                }
             }
         }
     }
@@ -172,15 +195,6 @@ $mobile-max-width: 425px;
                 }
             }
 
-            .actions {
-                display: flex;
-                gap: 20px;
-
-                button {
-                    font-size: 12px;
-                }
-            }
-
             .open-comments {
                 font-size: 14px;
                 opacity: 0.6;
@@ -203,7 +217,7 @@ $mobile-max-width: 425px;
     .comments {
         max-height: 300px;
         width: 300px;
-        overflow-y: scroll;
+        overflow-y: auto;
 
         &__item {
             padding: 10px;
@@ -219,22 +233,5 @@ $mobile-max-width: 425px;
     .manage {
         display: flex;
         gap: 30px;
-    }
-}
-
-@media (max-width: $mobile-max-width) {
-    .home {
-        flex-direction: column;
-        gap: $gap-medium;
-
-        &__item {
-            gap: $gap-medium;
-        }
-
-        .title {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
     }
 }

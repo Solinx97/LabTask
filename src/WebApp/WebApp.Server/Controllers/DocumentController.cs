@@ -158,6 +158,60 @@ public class DocumentController : ControllerBase
         return StatusCode((int)response.StatusCode);
     }
 
+    [HttpGet("statisticsByYear/{id}")]
+    public async Task<IActionResult> StatisticsByYear(Guid id)
+    {
+        var response = await _httpClient.GetAsync($"Document/statisticsByYear/{id}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            _logger.LogInformation("Count user {UserId} documents extracted successfully.", id);
+
+            var statistics = await response.Content.ReadFromJsonAsync<IEnumerable<StatisticByYearModel>>();
+
+            return Ok(statistics);
+        }
+
+        if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")
+        {
+            var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+            _logger.LogWarning("Downstream API returned problem for Count user {UserId} documents: {Title} - {Detail}", id, problem?.Title, problem?.Detail);
+
+            return StatusCode((int)response.StatusCode, problem);
+        }
+
+        _logger.LogError("Unexpected response from Document API for Count user {UserId} documents. Status: {StatusCode}", id, response.StatusCode);
+
+        return StatusCode((int)response.StatusCode);
+    }
+
+    [HttpGet("statisticsByRange/{id}")]
+    public async Task<IActionResult> StatisticsByRange(Guid id, [FromQuery] DateTimeOffset startedAt, [FromQuery] DateTimeOffset finishedAt)
+    {
+        var response = await _httpClient.GetAsync($"Document/statisticsByYear/{id}?startedAt={startedAt}&finishedAt={finishedAt}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            _logger.LogInformation("Count user {UserId} documents extracted successfully.", id);
+
+            var statistics = await response.Content.ReadFromJsonAsync<IEnumerable<StatisticByYearModel>>();
+
+            return Ok(statistics);
+        }
+
+        if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")
+        {
+            var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+            _logger.LogWarning("Downstream API returned problem for Count user {UserId} documents: {Title} - {Detail}", id, problem?.Title, problem?.Detail);
+
+            return StatusCode((int)response.StatusCode, problem);
+        }
+
+        _logger.LogError("Unexpected response from Document API for Count user {UserId} documents. Status: {StatusCode}", id, response.StatusCode);
+
+        return StatusCode((int)response.StatusCode);
+    }
+
     [HttpPatch("{id}")]
     public async Task<IActionResult> PartialUpdate(Guid id, [FromBody] DocumentModel item)
     {

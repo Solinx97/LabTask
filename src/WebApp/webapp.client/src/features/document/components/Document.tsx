@@ -3,6 +3,8 @@ import { useRef, useState } from 'react';
 import type { DocumentModel } from '../types/DocumentModel';
 import AddComment from './AddComment';
 import Comments from './Comments';
+import { faTrash, faPen, faMessage } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 interface Props {
     t: (key: string) => string;
@@ -18,11 +20,11 @@ interface Props {
     linksAllow?: boolean;
 }
 
-const Document: React.FC<Props> = ({ 
+const Document: React.FC<Props> = ({
     t, userId, document,
-    getTime, getDocumentLinks, commentsAllow = true, 
+    getTime, getDocumentLinks, commentsAllow = true,
     addCommentsAllow = true, updateAllow = true, deleteAllow = true,
-    commentActionsAllow = true, linksAllow = true 
+    commentActionsAllow = true, linksAllow = true
 }) => {
     const [deleteDocument] = useDeleteDocumentMutation();
     const [updateDocument] = useUpdateDocumentMutation();
@@ -104,14 +106,27 @@ const Document: React.FC<Props> = ({
                     <div className="description">{document.description}</div>
                     <div className="expire-at">{getTime(document.expireAt)}</div>
                     <div className="actions">
-                        {deleteAllow &&
-                            <button className="btn-border-shadow" onClick={async () => await deleteAsync(document.id)}>{t("Delete")}</button>
-                        }
-                        {updateAllow &&
-                            <button className="btn-border-shadow" onClick={() => updateHandle(document.id)}>{t("Update")}</button>
-                        }
+                        <div className="actions__main">
+                            {deleteAllow &&
+                                <FontAwesomeIcon
+                                    className="danger"
+                                    icon={faTrash}
+                                    onClick={async () => await deleteAsync(document.id)}
+                                />
+                            }
+                            {updateAllow &&
+                                <FontAwesomeIcon
+                                    className="success"
+                                    icon={faPen}
+                                    onClick={() => updateHandle(document.id)}
+                                />
+                            }
+                        </div>
                         {commentsAllow &&
-                            <button className={`btn-border-shadow ${isOpenComments && selectedDocumentId === document.id ? 'green' : ''}`} onClick={() => commentsHandle(document.id)}>{t("Comments")}</button>
+                            <FontAwesomeIcon
+                                icon={faMessage}
+                                onClick={() => commentsHandle(document.id)}
+                            />
                         }
                     </div>
                     {addCommentsAllow &&

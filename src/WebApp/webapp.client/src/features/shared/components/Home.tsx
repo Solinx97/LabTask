@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 
 import './Home.scss';
 import Manage from '@/features/document/components/Manage';
+import Statistics from '@/features/document/components/Statistics';
 
 const Home: React.FC = () => {
     const { t } = useTranslation('home');
@@ -16,7 +17,7 @@ const Home: React.FC = () => {
     const [section, setSection] = useState(-1);
 
     const getMenu = () => {
-        const menu = [t("MyDocuments"), t("History"), t("Manage")];
+        const menu = [t("MyDocuments"), t("History"), t("Manage"), t("Statistics")];
 
         if (user) {
             return (
@@ -67,6 +68,13 @@ const Home: React.FC = () => {
                 }
                 {section === 2 &&
                     <Manage
+                        t={t}
+                        userId={user?.id ?? ""}
+                        getTime={getTime}
+                    />
+                }
+                {section === 3 &&
+                    <Statistics
                         t={t}
                         userId={user?.id ?? ""}
                         getTime={getTime}

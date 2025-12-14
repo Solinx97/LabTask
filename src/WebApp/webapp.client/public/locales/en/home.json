@@ -23,5 +23,17 @@
   "CreateLink": "Create link",
   "DocumentName": "Document name",
   "CreateFor": "Create for",
-  "ExpiresAt": "Expires at"
+  "ExpiresAt": "Expires at",
+  "CreatedLinks": "Created links",
+  "LoadMore": "Load more",
+  "Statistics": "Statistics",
+  "StatisticsByYers": "Statistics by years",
+  "StatisticsByRange": "Statistics by range",
+  "SelectRange": "Select range",
+  "StartedAt": "Started at",
+  "FinishedAt": "Finished at",
+  "Year": "Year",
+  "CreatedAtDocumentCount": "Created at document (count)",
+  "UpdatedAtDocumentCount": "Updated at document (count)",
+  "ExpiredAtDocumentCount": "Expired at document (count)"
 }

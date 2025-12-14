@@ -10,6 +10,7 @@ public class Link : IEntityId
     private Link(Guid documentId, Guid ownerId, Guid toUserId, DateTimeOffset expireAt)
     {
         Id = Guid.NewGuid();
+        CreatedAt = DateTimeOffset.UtcNow;
         Uri = Guid.NewGuid();
         DocumentId = documentId;
         OwnerId = ownerId;
@@ -18,6 +19,8 @@ public class Link : IEntityId
     }
 
     public Guid Id { get; private set; }
+
+    public DateTimeOffset CreatedAt { get; private set; }
 
     public Guid Uri { get; private set; }
 

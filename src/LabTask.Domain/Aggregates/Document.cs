@@ -15,6 +15,7 @@ public class Document : IEntityId
     private Document(string name, string description, DateTimeOffset expireAt, Guid userId)
     {
         Id = Guid.NewGuid();
+        CreatedAt = DateTimeOffset.UtcNow;
         Name = name;
         Description = description;
         ExpireAt = expireAt;
@@ -23,11 +24,15 @@ public class Document : IEntityId
 
     public Guid Id { get; private set; }
 
+    public DateTimeOffset CreatedAt { get; private set; }
+
     public string Name { get; private set; } = string.Empty;
 
     public string Description { get; private set; } = string.Empty;
 
     public DateTimeOffset ExpireAt { get; private set; }
+
+    public DateTimeOffset? UpdatedAt { get; private set; }
 
     public Guid UserId { get; private set; }
 
@@ -39,8 +44,7 @@ public class Document : IEntityId
         ArgumentNullException.ThrowIfNull(description, nameof(description));
         ArgumentNullException.ThrowIfNull(userId, nameof(userId));
 
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(name.Length, NAME_MAX_LENGTH, nameof(name));
-
+        ContentLengthOutOfRangeException.ThrowIfLong(name, NAME_MAX_LENGTH, nameof(Name));
         DocumentExpireAtExcepction.ThrowIfPastTime(expireAt);
 
         return new Document(name, description, expireAt, userId);
@@ -72,14 +76,21 @@ public class Document : IEntityId
 
     public void Edit(string name, string description)
     {
-        if (!string.IsNullOrEmpty(name) && !string.Equals(name, Name, StringComparison.OrdinalIgnoreCase))
+        DocumentExpireAtExcepction.ThrowIfPastTime(ExpireAt);
+
+        if (!string.IsNullOrEmpty(name)
+            && !string.Equals(name, Name, StringComparison.OrdinalIgnoreCase)
+            && name.Length <= NAME_MAX_LENGTH)
         {
             Name = name;
+            UpdatedAt = DateTime.UtcNow;
         }
 
-        if (!string.IsNullOrEmpty(description) && !string.Equals(description, Description, StringComparison.OrdinalIgnoreCase))
+        if (!string.IsNullOrEmpty(description) 
+            && !string.Equals(description, Description, StringComparison.OrdinalIgnoreCase))
         {
             Description = description;
+            UpdatedAt = DateTime.UtcNow;
         }
     }
 }

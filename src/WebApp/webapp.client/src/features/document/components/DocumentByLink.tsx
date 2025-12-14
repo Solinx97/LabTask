@@ -1,5 +1,4 @@
 import { useGetDocumentByIdQuery } from '@/features/document/api/Document.api';
-import Loading from '@/features/shared/components/Loading';
 import Document from './Document';
 
 interface Props {
@@ -13,7 +12,7 @@ const DocumentByLink: React.FC<Props> = ({ t, id, userId, getTime }) => {
     const { data: document, isLoading } = useGetDocumentByIdQuery(id);
 
     if (isLoading || !document) {
-        return (<Loading />);
+        return (<></>);
     }
 
     return (

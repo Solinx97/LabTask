@@ -23,6 +23,9 @@ public class AppDbContext : DbContext
         {
             builder.HasKey(d => d.Id);
 
+            builder.Property(d => d.CreatedAt)
+                .IsRequired();
+
             builder.Property(d => d.Name)
                 .IsRequired()
                 .HasMaxLength(Domain.Aggregates.Document.NAME_MAX_LENGTH);
@@ -43,6 +46,9 @@ public class AppDbContext : DbContext
         {
             builder.HasKey(c => c.Id);
 
+            builder.Property(d => d.CreatedAt)
+                .IsRequired();
+
             builder.Property(c => c.Content)
                 .IsRequired()
                 .HasMaxLength(Domain.Entities.Comment.CONTENT_MAX_LENGTH);
@@ -57,6 +63,9 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Link>(builder =>
         {
             builder.HasKey(l => l.Id);
+
+            builder.Property(d => d.CreatedAt)
+                .IsRequired();
 
             builder.Property(l => l.Uri)
                 .IsRequired();

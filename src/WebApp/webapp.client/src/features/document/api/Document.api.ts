@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { DocumentModel } from '../types/DocumentModel';
+import type { StatisticModel } from '../types/StatisticModel';
 
 const apiURL = '/api/v1';
 
@@ -215,6 +216,12 @@ export const DocumentApi = createApi({
                     ]
                     : [{ type: 'Document', id: 'LIST' }],
         }),
+        getDocumentStatisticsByYear: builder.query<StatisticModel[], string>({
+            query: (userId) => `/Document/statisticsByYear/${userId}`,
+        }),
+        getDocumentStatisticsByRange: builder.query<StatisticModel[], { userId: string, startedAt: string, finishedAt: string }>({
+            query: ({ userId, startedAt, finishedAt }) => `/Document/statisticsByYear/${userId}?startedAt${startedAt}&finishedAt=${finishedAt}`,
+        }),
     })
 })
 
@@ -228,4 +235,6 @@ export const {
     useGetActualDocumentsByUserIdQuery,
     useLazyGetActualDocumentsByUserIdQuery,
     useGetHistoryDocumentsByUserIdQuery,
+    useGetDocumentStatisticsByYearQuery,
+    useLazyGetDocumentStatisticsByRangeQuery,
 } = DocumentApi;

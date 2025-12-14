@@ -7,7 +7,7 @@ public class DocumentExpireAtExcepction(string message) : DomainException(messag
     public static void ThrowIfPastTime(DateTimeOffset expireAt)
     {
         var now = DateTimeOffset.UtcNow;
-        if (expireAt <= now)
+        if (expireAt < now)
         {
             throw new DocumentExpireAtExcepction("Document expire at should be more than right now time.");
         }

@@ -2,6 +2,8 @@
 using LabTask.Application.Commands.DeleteDocument;
 using LabTask.Application.Commands.UpdateDocument;
 using LabTask.Application.DTOs;
+using LabTask.Application.Queries.DocumentStatisticsByRange;
+using LabTask.Application.Queries.DocumentStatisticsByYear;
 using LabTask.Application.Queries.GetActualDocumentsByUserId;
 using LabTask.Application.Queries.GetDocument;
 using LabTask.Application.Queries.GetDocumentByName;
@@ -57,6 +59,22 @@ public class DocumentController(IMediator mediator) : ControllerBase
         var documents = await _mediator.Send(new GetHistoryByUserIdQuery(id, page, pageSize));
 
         return Ok(documents);
+    }
+
+    [HttpGet("statisticsByYear/{id}")]
+    public async Task<IActionResult> StatisticsByYear(Guid id)
+    {
+        var statistics = await _mediator.Send(new DocumentStatisticsByYearQuery(id));
+
+        return Ok(statistics);
+    }
+
+    [HttpGet("statisticsByRange/{id}")]
+    public async Task<IActionResult> StatisticsByRange(Guid id, DateTimeOffset startedAt, DateTimeOffset finishedAt)
+    {
+        var statistics = await _mediator.Send(new DocumentStatisticsByRangeQuery(id, startedAt, finishedAt));
+
+        return Ok(statistics);
     }
 
     [HttpPatch("{id}")]

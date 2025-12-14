@@ -24,5 +24,17 @@
   "CreateLink": "Создать ссылку",
   "DocumentName": "Название документа",
   "CreateFor": "Создать для",
-  "ExpiresAt": "Время истичения срока"
+  "ExpiresAt": "Время истичения срока",
+  "CreatedLinks": "Созданные ссылки",
+  "LoadMore": "Загрузить больше",
+  "Statistics": "Статистика",
+  "StatisticsByYers": "Статистика за года",
+  "StatisticsByRange": "Статистика за период",
+  "SelectRange": "Выберите период",
+  "StartedAt": "Начало периода",
+  "FinishedAt": "Конец периода",
+  "Year": "Год",
+  "CreatedAtDocumentCount": "Документ создан (кол-во)",
+  "UpdatedAtDocumentCount": "Документ обновлен (кол-во)",
+  "ExpiredAtDocumentCount": "Время документа истекает (кол-во)"
 }
