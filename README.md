@@ -32,3 +32,4 @@
 - Add locations to Document (map coordinates)
 - Auto remove Document forever (delay for 30 days)
 - Edit Document from any user (who has access) in real time
+- Details about user document management
