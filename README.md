@@ -28,6 +28,11 @@
 - VS/VS Code
 - SSMS
 
+## Patterns
+- DDD
+- CQRS
+- Repository
+  
 ## Features in dev (not released yet)
 - Add locations to Document (map coordinates)
 - Auto remove Document forever (delay for 30 days)
